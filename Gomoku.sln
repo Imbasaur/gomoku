@@ -5,9 +5,13 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9EABBE1-4A5F-443C-B2B0-4EF94F47397A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gomoku.Api", "src\Gomoku.Api\Gomoku.Api.csproj", "{F5817257-FB61-4824-9C73-5690DED447D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gomoku.Api", "src\Gomoku.Api\Gomoku.Api.csproj", "{F5817257-FB61-4824-9C73-5690DED447D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gomoku.DAL", "src\Gomoku.DAL\Gomoku.DAL.csproj", "{9EF73F43-36C8-4123-B512-C72D61E52ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gomoku.DAL", "src\Gomoku.DAL\Gomoku.DAL.csproj", "{9EF73F43-36C8-4123-B512-C72D61E52ECA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gomoku.Infrastructure", "src\Gomoku.Infrastructure\Gomoku.Infrastructure.csproj", "{840C8621-D3B8-4AA8-AEB2-D44A3FB35364}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gomoku.Core", "src\Gomoku.Core\Gomoku.Core.csproj", "{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +27,14 @@ Global
 		{9EF73F43-36C8-4123-B512-C72D61E52ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EF73F43-36C8-4123-B512-C72D61E52ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EF73F43-36C8-4123-B512-C72D61E52ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{840C8621-D3B8-4AA8-AEB2-D44A3FB35364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{840C8621-D3B8-4AA8-AEB2-D44A3FB35364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{840C8621-D3B8-4AA8-AEB2-D44A3FB35364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{840C8621-D3B8-4AA8-AEB2-D44A3FB35364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +42,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F5817257-FB61-4824-9C73-5690DED447D2} = {B9EABBE1-4A5F-443C-B2B0-4EF94F47397A}
 		{9EF73F43-36C8-4123-B512-C72D61E52ECA} = {B9EABBE1-4A5F-443C-B2B0-4EF94F47397A}
+		{840C8621-D3B8-4AA8-AEB2-D44A3FB35364} = {B9EABBE1-4A5F-443C-B2B0-4EF94F47397A}
+		{AD6BEBE1-FD1B-4D9A-9759-01DAD377F251} = {B9EABBE1-4A5F-443C-B2B0-4EF94F47397A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C653E12B-78CE-4006-86B4-4430A561DE53}
