@@ -1,6 +1,6 @@
 using Gomoku.DAL;
-using Microsoft.EntityFrameworkCore;
 using Gomoku.Infrastructure.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gomoku.Api;
 
@@ -13,7 +13,7 @@ public class Program
         builder.Services.AddConfiguration(builder.Configuration);
 
         // Add services to the container.
-
+        builder.Services.AddServices();
         builder.Services.AddDbContext<GomokuDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("GomokuDb")));
         builder.Services.AddControllers();

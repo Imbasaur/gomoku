@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Gomoku.DAL\Gomoku.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
