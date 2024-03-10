@@ -7,7 +7,7 @@ namespace Gomoku.Api.Controllers;
 public class GameController(IGameService gameService) : Controller
 {
     [HttpPost]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> CreateGame()
     {
         return Ok(await gameService.CreateGame());
     }

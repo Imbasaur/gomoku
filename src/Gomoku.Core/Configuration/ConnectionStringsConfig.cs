@@ -1,5 +1,5 @@
 ﻿namespace Gomoku.Core.Configuration;
 public class ConnectionStringsConfig
 {
-    public string GomokuDb { get; set; }
+    public required string GomokuDb { get; set; }
 }

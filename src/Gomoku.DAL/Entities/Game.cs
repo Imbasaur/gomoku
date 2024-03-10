@@ -8,7 +8,7 @@ public sealed class Game : IEntity<int>
     public Guid Code { get; set; }
     public string? Moves { get; set; }
     public GameState State { get; set; }
-    public required string BlackName { get; set; }
-    public required string WhiteName { get; set; }
+    public string BlackName { get; set; }
+    public string WhiteName { get; set; }
     public string? Winner { get; set; }
 }

@@ -1,6 +1,11 @@
 @Gomoku.Api_HostAddress = http://localhost:5194
 
-GET {{Gomoku.Api_HostAddress}}/weatherforecast/
+GET {{Gomoku.Api_HostAddress}}/Test/
+Accept: application/json
+
+###
+
+POST {{Gomoku.Api_HostAddress}}/Game/
 Accept: application/json
 
 ###
