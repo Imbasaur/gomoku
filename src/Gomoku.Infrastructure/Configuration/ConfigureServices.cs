@@ -1,6 +1,8 @@
-﻿using Gomoku.Core.Services.Abstract;
+﻿using Gomoku.Core.Profiles;
+using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Repository;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Gomoku.Infrastructure.Configuration;
 public static class ConfigureServices
@@ -14,6 +16,8 @@ public static class ConfigureServices
                 .AddClasses(classes => classes.AssignableTo<IGameService>())
                 .AsImplementedInterfaces()
                 .WithTransientLifetime());
+
+        services.AddAutoMapper(Assembly.GetAssembly(typeof(GameProfiles)));
 
         return services;
     }
