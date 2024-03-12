@@ -20,4 +20,13 @@ public class GomokuDbContext : DbContext
             optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=postgres;Username=postgres;Password=1d#f%gdsVC45#!!");
         }
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<PlayerWaiting>()
+            .HasIndex(pw => pw.PlayerName)
+            .IsUnique();
+    }
 }

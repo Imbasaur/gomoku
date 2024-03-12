@@ -63,4 +63,13 @@ public abstract class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEn
         DbSet.Remove(entity);
         Context.SaveChanges();
     }
+
+    public void Delete(Expression<Func<TEntity, bool>> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        var entity = DbSet.SingleOrDefault(predicate);
+        ArgumentNullException.ThrowIfNull(entity);
+        DbSet.Remove(entity);
+        Context.SaveChanges();
+    }
 }
