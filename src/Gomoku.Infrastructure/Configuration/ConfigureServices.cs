@@ -10,6 +10,7 @@ public static class ConfigureServices
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IGameRepository, GameRepository>();
+        services.AddScoped<IWaitingListRepository, WaitingListRepository>();
 
         services.Scan(scan => scan
             .FromAssemblyOf<IGameService>()

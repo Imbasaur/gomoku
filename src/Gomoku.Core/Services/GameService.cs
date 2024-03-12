@@ -8,7 +8,7 @@ using Gomoku.DAL.Repository;
 namespace Gomoku.Core.Services;
 public class GameService(IGameRepository repository, IMapper mapper) : IGameService
 {
-    public Task<Guid> CreateGame()
+    public Task<Guid> Create()
     {
         var gameCode = Guid.NewGuid();
 
@@ -23,17 +23,24 @@ public class GameService(IGameRepository repository, IMapper mapper) : IGameServ
         return Task.FromResult(gameCode);
     }
 
-    public Task<GameDto> GetGame(Guid gameCode)
+    public Task<GameDto> Get(Guid gameCode)
     {
         var game = repository.Get(x => x.Code == gameCode);
 
         return Task.FromResult(mapper.Map<GameDto>(game));
     }
 
-    public Task<IEnumerable<GameDto>> GetGames()
+    public Task<IEnumerable<GameDto>> GetAll()
     {
         var games = repository.GetMany();
 
         return Task.FromResult(mapper.Map<IEnumerable<GameDto>>(games));
+    }
+
+    public Task SetGameState(Guid code, GameState state)
+    {
+        repository.SetState(code, state);
+
+        return Task.CompletedTask;
     }
 }

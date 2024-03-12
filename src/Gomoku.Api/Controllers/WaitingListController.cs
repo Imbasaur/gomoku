@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gomoku.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class GameController(IGameService gameService) : Controller
+public class WaitingListController(IGameService gameService) : Controller
 {
     [HttpPost]
     public async Task<IActionResult> CreateGame()

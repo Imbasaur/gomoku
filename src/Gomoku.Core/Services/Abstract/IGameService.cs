@@ -4,7 +4,7 @@ namespace Gomoku.Core.Services.Abstract;
 
 public interface IGameService
 {
-    Task<Guid> CreateGame();
-    Task<IEnumerable<GameDto>> GetGames();
-    Task<GameDto> GetGame(Guid gameCode);
+    Task<Guid> Create();
+    Task<IEnumerable<GameDto>> GetAll();
+    Task<GameDto> Get(Guid gameCode);
 }

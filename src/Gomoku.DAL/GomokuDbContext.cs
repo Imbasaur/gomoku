@@ -11,6 +11,7 @@ public class GomokuDbContext : DbContext
     { }
 
     public DbSet<Game> Games { get; set; }
+    public DbSet<PlayerWaiting> WaitingList { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
