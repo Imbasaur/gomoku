@@ -14,9 +14,8 @@ public static class ConfigureServices
 
         services.Scan(scan => scan
             .FromAssemblyOf<IGameService>()
-                .AddClasses(classes => classes.AssignableTo<IGameService>())
-                .AsImplementedInterfaces()
-                .WithTransientLifetime());
+            .AddClasses()
+            .AsMatchingInterface());
 
         services.AddAutoMapper(Assembly.GetAssembly(typeof(GameProfiles)));
 

@@ -4,24 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gomoku.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class WaitingListController(IGameService gameService) : Controller
+public class WaitingListController(IWaitingListService waitingListService) : Controller
 {
-    [HttpPost]
-    public async Task<IActionResult> CreateGame()
-    {
-        return Ok(await gameService.Create());
-    }
-
     [HttpGet]
+    [Route("count")]
     public async Task<IActionResult> GetGames()
     {
-        return Ok(await gameService.GetAll());
+        return Ok(await waitingListService.Count());
     }
 
     [HttpGet]
-    [Route("{code}")]
-    public async Task<IActionResult> GetGame(Guid code)
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(await gameService.Get(code));
+        return Ok(await waitingListService.GetAll());
     }
 }
