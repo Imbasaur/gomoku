@@ -1,10 +1,12 @@
-﻿using Gomoku.Core.Services.Abstract;
+﻿using Gomoku.Api.Hubs;
+using Gomoku.Core.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class GameController(IGameService gameService) : Controller
+public class GameController(IGameService gameService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreateGame()

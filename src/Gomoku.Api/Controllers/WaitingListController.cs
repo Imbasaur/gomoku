@@ -1,16 +1,30 @@
-﻿using Gomoku.Core.Services.Abstract;
+﻿using Gomoku.Api.Hubs;
+using Gomoku.Core.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class WaitingListController(IWaitingListService waitingListService) : Controller
+public class WaitingListController(IWaitingListService waitingListService, IHubContext<GameHub> hub) : ControllerBase
 {
     [HttpGet]
     [Route("count")]
-    public async Task<IActionResult> GetGames()
+    public async Task<IActionResult> GetPlayersWaiting()
     {
         return Ok(await waitingListService.Count());
+    }
+
+    [HttpPost]
+    [Route("join")]
+    public async Task<IActionResult> JoinWaitingList(string playerName)
+    {
+        await waitingListService.Add(playerName);
+
+        await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", playerName);
+        
+
+        return Ok();
     }
 
     [HttpGet]
