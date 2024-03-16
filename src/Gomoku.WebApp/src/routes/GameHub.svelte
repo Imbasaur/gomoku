@@ -11,9 +11,9 @@
         .withAutomaticReconnect()
         .build();
 
-    connection.on("PlayerJoinedWaitingList", player => {
-        console.log("Player " + player + ' joined waiting list.');
-        this.player = player;
+    connection.on('PlayerJoinedWaitingList', name => {
+        player = name;
+        console.log('Player ' + player + ' joined waiting list.');
     })
 
     onMount(async () => {

@@ -1,7 +1,5 @@
-﻿using Gomoku.Api.Hubs;
-using Gomoku.Core.Services.Abstract;
+﻿using Gomoku.Core.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
