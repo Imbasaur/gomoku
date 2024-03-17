@@ -28,7 +28,7 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
 
     public Task Remove(string playerName)
     {
-        repository.Delete(x => x.PlayerName.Equals(playerName, StringComparison.InvariantCultureIgnoreCase));
+        repository.Delete(x => x.PlayerName.ToLower().Equals(playerName.ToLower())); // this will be id in future
 
         return Task.CompletedTask;
     }

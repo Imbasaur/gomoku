@@ -2,7 +2,6 @@
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
-	import GameHub from './GameHub.svelte';
 </script>
 
 <svelte:head>
@@ -26,7 +25,6 @@
 		try editing <strong>src/routes/+page.svelte</strong>
 	</h2>
 
-	<GameHub />
 	<Counter />
 </section>
 

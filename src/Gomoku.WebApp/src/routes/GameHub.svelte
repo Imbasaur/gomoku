@@ -2,7 +2,10 @@
     import {HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
     import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
-    export let player = '';
+    /**
+	 * @type {string | any[]}
+	 */
+    let waitingList = [];
     const dispatch = createEventDispatcher();  
 
     const connection = new HubConnectionBuilder()
@@ -12,8 +15,16 @@
         .build();
 
     connection.on('PlayerJoinedWaitingList', name => {
-        player = name;
-        console.log('Player ' + player + ' joined waiting list.');
+        waitingList =[...waitingList, name];
+        console.log('Player ' + name + ' joined waiting list.');
+    })
+
+    connection.on('PlayerLeftWaitingList', name => {
+        const index = waitingList.indexOf(name, 0);
+        if (index > -1) {
+            waitingList = [...waitingList.slice(0, index), ...waitingList.slice(index + 1)]; // filter? 
+        }
+        console.log('Player ' + name + ' left waiting list.');
     })
 
     onMount(async () => {
@@ -27,5 +38,10 @@
 </script>
 
 <div>
-    <p>{player}</p>
+    <p>Waiting list:</p>
+    <ul>
+        {#each waitingList as playerWaiting}
+            <li>{playerWaiting}</li>
+        {/each}
+    </ul>
 </div>

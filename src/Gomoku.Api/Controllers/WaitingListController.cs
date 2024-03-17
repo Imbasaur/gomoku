@@ -23,7 +23,17 @@ public class WaitingListController(IWaitingListService waitingListService, IHubC
 
         await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", playerName);
         
+        return Ok();
+    }
 
+    [HttpDelete]
+    [Route("{playerName}")]
+    public async Task<IActionResult> RemoveFromWaitingList(string playerName)
+    {
+        await waitingListService.Remove(playerName);
+
+        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", playerName);
+        
         return Ok();
     }
 
