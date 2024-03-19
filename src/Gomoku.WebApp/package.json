@@ -32,6 +32,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@microsoft/signalr": "^8.0.0"
+		"@microsoft/signalr": "^8.0.0",
+		"@types/uuid": "^9.0.8",
+		"uuid": "^9.0.1"
 	}
 }
