@@ -57,7 +57,9 @@
     
     
 </script>
-
+<div>
+    <p>Player name is {playerName}</p>
+</div>
 <button on:click={triggerPlayerReady}>
     {#if playerReady}
         Cancel
