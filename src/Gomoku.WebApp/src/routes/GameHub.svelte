@@ -1,6 +1,6 @@
 <script>
     import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-    import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+    import { onDestroy, createEventDispatcher } from 'svelte';
     import WaitingList from "./WaitingList.svelte";
     import joinWaitingList from './WaitingList.svelte'
     import { waitingList, player } from "$lib/stores";
@@ -46,20 +46,15 @@
         console.log('Player ' + name + ' left waiting list.');
     })
 
-    // onMount(async () => {
-    //     await connection.start();
-    // });
-
     onDestroy(async () => {
         await connection.stop();
-    });
-
-    
-    
+    });    
 </script>
+
 <div>
     <p>Player name is {playerName}</p>
 </div>
+
 <button on:click={triggerPlayerReady}>
     {#if playerReady}
         Cancel

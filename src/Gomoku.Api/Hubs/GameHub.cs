@@ -2,10 +2,12 @@
 
 namespace Gomoku.Api.Hubs;
 
-public class GameHub : Hub
+public class GameHub(ILogger<GameHub> logger) : Hub
 {
-    public async Task SendMessage(string user, string message)
+    public override Task OnConnectedAsync()
     {
-        await Clients.All.SendAsync("ReceiveMessage", user, message);
+        logger.LogInformation($"New client connected to {nameof(GameHub)} with connectionId {Context.ConnectionId} {Context.UserIdentifier}");
+
+        return base.OnConnectedAsync();
     }
 }
