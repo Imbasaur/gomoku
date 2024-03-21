@@ -25,11 +25,11 @@
         } else {
             await connection.stop();
         }
-
     }
+
     const connection = new HubConnectionBuilder()
         .withUrl("http://localhost:5190/gameHub")
-        .configureLogging(LogLevel.Information)
+        .configureLogging(LogLevel.Debug)
         .withAutomaticReconnect()
         .build();
 
