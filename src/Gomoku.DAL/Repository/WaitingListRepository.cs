@@ -7,4 +7,11 @@ public class WaitingListRepository(GomokuDbContext dbContext) : BaseRepository<P
     {
         return DbSet.Count();
     }
+    public List<string> GetTop2()
+    {
+        return DbSet.OrderBy(x => x.Id)
+            .Take(2)
+            .Select(x => x.PlayerName)
+            .ToList();
+    }
 }

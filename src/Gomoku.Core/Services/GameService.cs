@@ -6,21 +6,28 @@ using Gomoku.DAL.Enums;
 using Gomoku.DAL.Repository;
 
 namespace Gomoku.Core.Services;
-public class GameService(IGameRepository repository, IMapper mapper) : IGameService
+public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository) : IGameService
 {
-    public Task<Guid> Create()
+    public Task<GameCreatedDto> Create()
     {
-        var gameCode = Guid.NewGuid();
+        var players = waitingListRepository.GetTop2();
 
-        repository.Add(new Game
+        if (players == null || players.Count() < 2)
+            return null;
+
+        var gameCode = Guid.NewGuid();
+        var game = new Game
         {
-            BlackName = "black",
-            WhiteName = "white",
+            BlackName = players[0], // todo: have to add some randomisation here
+            WhiteName = players[1],
             Code = gameCode,
             State = GameState.Created
-        });
+        };
 
-        return Task.FromResult(gameCode);
+        repository.Add(game);
+        waitingListRepository.Delete(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
+
+        return Task.FromResult(mapper.Map<GameCreatedDto>(game));
     }
 
     public Task<GameDto> Get(Guid gameCode)

@@ -4,24 +4,22 @@
     import WaitingList from "./WaitingList.svelte";
     import joinWaitingList from './WaitingList.svelte'
     import { waitingList, player } from "$lib/stores";
-    import { v4 as uuid } from "uuid";
     
 
     const dispatch = createEventDispatcher();
 
     let playerReady = false;
     let wlComp;
-    let playerName = uuid();
-    player.set(playerName);
 
     const triggerPlayerReady = async () => {
         playerReady = !playerReady;
-        console.log("playerReady:" + playerReady);
-        console.log("playerName:" + playerName);
 
         if (playerReady){
-            await connection.start();
-            wlComp.joinWaitingList(playerName);
+            await connection.start()
+            .then(() => {
+                wlComp.joinWaitingList(connection.connectionId); // use connectionId as player name, we will do proper user later
+                player.set(connection.connectionId);
+            })
         } else {
             await connection.stop();
         }
@@ -48,11 +46,39 @@
 
     onDestroy(async () => {
         await connection.stop();
-    });    
+    });
+    
+    export function createGame() {
+        fetch("http://localhost:5190/Game", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to create game.')
+            }
+            let data = response.json();
+            console.log("Successfully created game.");
+            $waitingList = $waitingList.filter(player =>
+            player !== data.blackName && player !== data.whiteName
+            );
+        })
+        .catch(error => {
+            console.error('Error creating game:', error.message);
+        });
+    }
+
+    waitingList.subscribe((val) => {
+        if (val.length > 1){
+            createGame()
+        }
+    })
 </script>
 
 <div>
-    <p>Player name is {playerName}</p>
+    <p>Player name is {$player}</p>
 </div>
 
 <button on:click={triggerPlayerReady}>

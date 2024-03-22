@@ -5,4 +5,5 @@ namespace Gomoku.DAL.Repository;
 public interface IWaitingListRepository : IBaseRepository<PlayerWaiting, int>
 {
     int Count();
+    List<string> GetTop2();
 }

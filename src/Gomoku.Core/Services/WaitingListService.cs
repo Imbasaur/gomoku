@@ -11,6 +11,9 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
     {
         repository.Add(new PlayerWaiting(playerName));
 
+        // should check if 2 players joined, if so then triggeer CreateGame
+        // also should move hub calls to services (?)
+
         return Task.CompletedTask;
     }
 

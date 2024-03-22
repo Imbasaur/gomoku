@@ -9,6 +9,7 @@ public class GameProfiles : Profile
     public GameProfiles()
     {
         CreateMap<Game, GameDto>().ReverseMap();
+        CreateMap<Game, GameCreatedDto>();
         CreateMap<PlayerWaiting, PlayerWaitingDto>().ReverseMap();
     }
 }
