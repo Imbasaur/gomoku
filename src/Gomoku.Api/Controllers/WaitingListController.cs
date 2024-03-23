@@ -1,6 +1,7 @@
 ﻿using Gomoku.Api.Hubs;
 using Gomoku.Core.Requests;
 using Gomoku.Core.Services.Abstract;
+using Gomoku.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -13,6 +14,8 @@ public class WaitingListController(IWaitingListService waitingListService, IHubC
     [Route("count")]
     public async Task<IActionResult> GetPlayersWaiting()
     {
+        await hub.Clients.All.SendAsync("Count", 1);
+
         return Ok(await waitingListService.Count());
     }
 
@@ -21,8 +24,6 @@ public class WaitingListController(IWaitingListService waitingListService, IHubC
     public async Task<IActionResult> JoinWaitingList(JoinWaitingListRequest player)
     {
         await waitingListService.Add(player.PlayerName);
-
-        await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", player.PlayerName);
         
         return Ok();
     }
@@ -32,8 +33,6 @@ public class WaitingListController(IWaitingListService waitingListService, IHubC
     public async Task<IActionResult> RemoveFromWaitingList(string playerName)
     {
         await waitingListService.Remove(playerName);
-
-        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", playerName);
         
         return Ok();
     }

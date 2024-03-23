@@ -7,9 +7,6 @@
 
     waitingList.subscribe((val) => {
         waitingList_value = val;
-        if (val.length > 1){
-            
-        }
     })
 
     export function joinWaitingList(playerName: string) {
@@ -25,6 +22,7 @@
                 throw new Error('Failed to join waiting list.')
             }
             console.log("Successfully joined waiting list.");
+            $waitingList.push(playerName);
         })
         .catch(error => {
             console.error('Error joining waiting list:', error.message);

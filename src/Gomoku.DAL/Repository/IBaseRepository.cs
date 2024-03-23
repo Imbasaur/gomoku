@@ -13,4 +13,5 @@ public interface IBaseRepository<TEntity, T>
     void Update(TEntity entity);
     void Delete(TEntity entity);
     void Delete(Expression<Func<TEntity, bool>> predicate);
+    void DeleteMany(Expression<Func<TEntity, bool>> predicate);
 }

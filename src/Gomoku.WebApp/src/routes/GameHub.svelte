@@ -12,18 +12,15 @@
     let wlComp;
 
     const triggerPlayerReady = async () => {
-        playerReady = !playerReady;
-
-        if (playerReady){
+        if (!playerReady && connection.state === HubConnectionState.Disconnected){
             await connection.start()
-            .then(() => {
-                wlComp.joinWaitingList(connection.connectionId); // use connectionId as player name, we will do proper user later
-                player.set(connection.connectionId);
-            })
-        } else {
+            await wlComp.joinWaitingList(connection.connectionId)
+            player.set(connection.connectionId); // use connectionId as player name, we will do proper user later
+        } else if (connection.state === HubConnectionState.Connected) {
             await connection.stop();
         }
-    }
+        playerReady = !playerReady;
+    };
 
     const connection = new HubConnectionBuilder()
         .withUrl("http://localhost:5190/gameHub")
@@ -48,7 +45,7 @@
         await connection.stop();
     });
     
-    export function createGame() {
+    export function createGame() { // do i even need to call this from front? no needed in quckfinding
         fetch("http://localhost:5190/Game", {
             method: 'POST',
             headers: {
@@ -61,20 +58,13 @@
             }
             let data = response.json();
             console.log("Successfully created game.");
-            $waitingList = $waitingList.filter(player =>
-            player !== data.blackName && player !== data.whiteName
-            );
+            $waitingList = $waitingList.filter(player => player !== data.blackName && player !== data.whiteName);
+            console.log($waitingList)
         })
         .catch(error => {
             console.error('Error creating game:', error.message);
         });
     }
-
-    waitingList.subscribe((val) => {
-        if (val.length > 1){
-            createGame()
-        }
-    })
 </script>
 
 <div>

@@ -1,20 +1,24 @@
 ﻿using AutoMapper;
+using Gomoku.Api.Hubs;
 using Gomoku.Core.Dtos.WaitingList;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Entities;
 using Gomoku.DAL.Repository;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Gomoku.Core.Services;
-public class WaitingListService(IWaitingListRepository repository, IMapper mapper) : IWaitingListService
+public class WaitingListService(IWaitingListRepository repository, IMapper mapper, IHubContext<GameHub> hub, IGameService gameService) : IWaitingListService
 {
-    public Task Add(string playerName)
+    public async Task Add(string playerName)
     {
         repository.Add(new PlayerWaiting(playerName));
 
-        // should check if 2 players joined, if so then triggeer CreateGame
-        // also should move hub calls to services (?)
+        await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
 
-        return Task.CompletedTask;
+        if (repository.Count() > 1)
+            await gameService.Create();
+
+        return;
     }
 
     public Task<int> Count()
@@ -29,10 +33,12 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
         return Task.FromResult(mapper.Map<IEnumerable<PlayerWaitingDto>>(players));
     }
 
-    public Task Remove(string playerName)
+    public async Task Remove(string playerName)
     {
         repository.Delete(x => x.PlayerName.ToLower().Equals(playerName.ToLower())); // this will be id in future
 
-        return Task.CompletedTask;
+        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", playerName);
+
+        return;
     }
 }

@@ -72,4 +72,13 @@ public abstract class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEn
         DbSet.Remove(entity);
         Context.SaveChanges();
     }
+
+    public void DeleteMany(Expression<Func<TEntity, bool>> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        var entity = DbSet.Where(predicate);
+        ArgumentNullException.ThrowIfNull(entity);
+        DbSet.RemoveRange(entity);
+        Context.SaveChanges();
+    }
 }
