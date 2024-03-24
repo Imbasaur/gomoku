@@ -12,7 +12,8 @@ builder.Services.AddServices();
 builder.Services.AddDbContext<GomokuDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("GomokuDb")));
 builder.Services.AddControllers();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
