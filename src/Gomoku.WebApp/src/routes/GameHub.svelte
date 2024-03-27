@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
     import { onDestroy, createEventDispatcher } from 'svelte';
     import WaitingList from "./WaitingList.svelte";
@@ -17,6 +17,10 @@
             await wlComp.joinWaitingList(connection.connectionId)
             player.set(connection.connectionId); // use connectionId as player name, we will do proper user later
         } else if (connection.state === HubConnectionState.Connected) {
+            if ($waitingList.find(x => x === connection.connectionId)){
+                await wlComp.removeFromWaitingList(connection.connectionId);
+                removeFromWaitingListLocal(connection.connectionId);
+            }
             await connection.stop();
         }
         playerReady = !playerReady;
@@ -34,12 +38,20 @@
     })
 
     connection.on('PlayerLeftWaitingList', name => {
+        removeFromWaitingListLocal(name);
+        console.log('Player ' + name + ' left waiting list.');
+    })
+
+    connection.on('GameCreated', name => {
+        console.log('Player ' + name + ' left waiting list.');
+    })
+
+    function removeFromWaitingListLocal(name: string){
         const index = $waitingList.indexOf(name, 0);
         if (index > -1) {
             $waitingList = [...$waitingList.slice(0, index), ...$waitingList.slice(index + 1)]; // filter? 
         }
-        console.log('Player ' + name + ' left waiting list.');
-    })
+    }
 
     onDestroy(async () => {
         await connection.stop();

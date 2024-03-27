@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { waitingList } from "$lib/stores";
+    import { player, waitingList } from "$lib/stores";
     import createGame from './GameHub.svelte';
 
 
@@ -26,6 +26,25 @@
         })
         .catch(error => {
             console.error('Error joining waiting list:', error.message);
+        });
+    }
+
+    export function removeFromWaitingList(playerName: string) {
+        fetch("http://localhost:5190/WaitingList/" + playerName, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to remove from waiting list.')
+            }
+            console.log("Successfully removed from waiting list.");
+            $waitingList.push(playerName);
+        })
+        .catch(error => {
+            console.error('Error removing from waiting list:', error.message);
         });
     }
 </script>

@@ -1,14 +1,13 @@
-﻿using Gomoku.Core.Hubs;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace Gomoku.Api.Hubs;
 
-public class GameHub(ILogger<GameHub> logger) : Hub<IGameHub>
+public class GameHub(ILogger<GameHub> logger) : Hub
 {
     public async Task SendMessageAsync(string name, string message)
     {
-        await Clients.All.SendMessageAsync(name, message);
+        await Clients.All.SendAsync(name, message);
     }
 
     public override Task OnConnectedAsync()

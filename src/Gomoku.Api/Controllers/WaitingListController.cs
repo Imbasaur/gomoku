@@ -1,20 +1,16 @@
-﻿using Gomoku.Api.Hubs;
-using Gomoku.Core.Requests;
+﻿using Gomoku.Core.Requests;
 using Gomoku.Core.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
-public class WaitingListController(IWaitingListService waitingListService, IHubContext<GameHub> hub) : ControllerBase
+public class WaitingListController(IWaitingListService waitingListService) : ControllerBase
 {
     [HttpGet]
     [Route("count")]
     public async Task<IActionResult> GetPlayersWaiting()
     {
-        await hub.Clients.All.SendAsync("Count", 1);
-
         return Ok(await waitingListService.Count());
     }
 
