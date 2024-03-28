@@ -43,7 +43,18 @@
     })
 
     connection.on('GameCreated', name => {
-        console.log('Player ' + name + ' left waiting list.');
+        joinGame(name, $player)
+        console.log('Game ' + name + ' created.');
+    })
+
+    connection.on('PlayerConnected', name => {
+        // nothing happens here for now
+        console.log('Player ' + name + ' connected.');
+    })
+
+    connection.on('PlayersConnected', () => {
+        // todo: display board, start the game etc
+        console.log('Both players connected.');
     })
 
     function removeFromWaitingListLocal(name: string){
@@ -66,12 +77,32 @@
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to create game.')
+                throw new Error('Failed to create the game.')
             }
             let data = response.json();
-            console.log("Successfully created game.");
+            console.log("Successfully created the game.");
             $waitingList = $waitingList.filter(player => player !== data.blackName && player !== data.whiteName);
             console.log($waitingList)
+        })
+        .catch(error => {
+            console.error('Error creating the game:', error.message);
+        });
+    }
+    
+    export function joinGame(code: string, playerName: string) { 
+        fetch("http://localhost:5190/Game/join", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code, playerName})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to join the game')
+            }
+            console.log("Successfully joined the game.");
+            // anything else?
         })
         .catch(error => {
             console.error('Error creating game:', error.message);

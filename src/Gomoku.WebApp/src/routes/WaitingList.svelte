@@ -2,13 +2,6 @@
     import { player, waitingList } from "$lib/stores";
     import createGame from './GameHub.svelte';
 
-
-    let waitingList_value: any[] = [];
-
-    waitingList.subscribe((val) => {
-        waitingList_value = val;
-    })
-
     export function joinWaitingList(playerName: string) {
         fetch("http://localhost:5190/WaitingList/join", {
             method: 'POST',
@@ -41,7 +34,7 @@
                 throw new Error('Failed to remove from waiting list.')
             }
             console.log("Successfully removed from waiting list.");
-            $waitingList.push(playerName);
+            $waitingList = $waitingList.filter(player => player !== playerName);
         })
         .catch(error => {
             console.error('Error removing from waiting list:', error.message);
@@ -52,7 +45,7 @@
 <div>
     <p>Waiting list:</p>
     <ul>
-        {#each waitingList_value as playerWaiting}
+        {#each $waitingList as playerWaiting}
             <li>{playerWaiting}</li>
         {/each}
     </ul>

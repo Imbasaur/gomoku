@@ -9,6 +9,5 @@ public sealed class PlayerWaiting : IEntity<int>
 
     public PlayerWaiting(string playerName) => PlayerName = playerName;
 
-    public PlayerWaiting()
-    { }
+    public PlayerWaiting() { }
 }

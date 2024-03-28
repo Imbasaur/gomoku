@@ -5,5 +5,7 @@ using Gomoku.DAL.Repository.Abstract;
 namespace Gomoku.DAL.Repository;
 public interface IGameRepository : IBaseRepository<Game, int>
 {
-    void SetState(Guid code, GameState state);
+    Task SetState(Guid code, GameState state);
+    Task ConnectPlayer(Guid code, string playerName);
+    Task<bool> AreBothPlayersConnected(Guid code);
 }

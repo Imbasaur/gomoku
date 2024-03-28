@@ -3,6 +3,7 @@ using System;
 using Gomoku.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Gomoku.DAL.Migrations
 {
     [DbContext(typeof(GomokuDbContext))]
-    partial class GomokuDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240328220654_Add_playersConnected_variant_to_game")]
+    partial class Add_playersConnected_variant_to_game
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

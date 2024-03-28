@@ -14,7 +14,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     {
         var players = waitingListRepository.GetTop2();
 
-        if (players == null || players.Count() < 2)
+        if (players == null || players.Count < 2)
             return null;
 
         var gameCode = Guid.NewGuid();
@@ -32,8 +32,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.WhiteName); // todo: remove this, don't really need to update waitingList on frontend side
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.BlackName);
 
-        await hub.Clients.Clients(game.BlackName, game.WhiteName).SendAsync("GameCreated", game); // maybe create group per game? how to list game for observers?
-        await hub.Clients.All.SendAsync("GameCreatedAll", game); // maybe create group per game? how to list game for observers?
+        await hub.Groups.AddToGroupAsync(game.WhiteName, game.Code.ToString());
+        await hub.Groups.AddToGroupAsync(game.BlackName, game.Code.ToString());
+        await hub.Clients.Group(game.Code.ToString()).SendAsync("GameCreated", game.Code); // how to handle observers, add them to gorup? is there any limit in groups?
 
         return mapper.Map<GameCreatedDto>(game);
     }
@@ -52,10 +53,21 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         return Task.FromResult(mapper.Map<IEnumerable<GameDto>>(games));
     }
 
-    public Task SetGameState(Guid code, GameState state)
+    public async Task SetGameState(Guid code, GameState state)
     {
-        repository.SetState(code, state);
+        await repository.SetState(code, state);
+    }
 
-        return Task.CompletedTask;
+    public async Task Join(Guid code, string playerName)
+    {
+        await repository.ConnectPlayer(code, playerName);
+
+        if (await repository.AreBothPlayersConnected(code))
+        {
+            await repository.SetState(code, GameState.PlayersConnected);
+            await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+        }
+        else
+            await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
     }
 }

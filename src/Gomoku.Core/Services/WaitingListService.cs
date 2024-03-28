@@ -13,7 +13,7 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
     {
         repository.Add(new PlayerWaiting(playerName));
 
-        await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
+        await hub.Clients.AllExcept(playerName).SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
 
         if (repository.Count() > 1)
             await gameService.Create();

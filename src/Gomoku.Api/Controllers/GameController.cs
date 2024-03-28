@@ -1,4 +1,5 @@
-﻿using Gomoku.Core.Services.Abstract;
+﻿using Gomoku.Core.Requests;
+using Gomoku.Core.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gomoku.Api.Controllers;
@@ -25,5 +26,14 @@ public class GameController(IGameService gameService) : ControllerBase
     public async Task<IActionResult> GetGame(Guid code)
     {
         return Ok(await gameService.Get(code));
+    }
+
+    [HttpPut]
+    [Route("join")]
+    public async Task<IActionResult> JoinGame(JoinGameRequest request) // todo: change to caller identity
+    {
+        await gameService.Join(request.Code, request.PlayerName);
+
+        return Ok();
     }
 }
