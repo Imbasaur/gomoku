@@ -16,6 +16,7 @@
 </svelte:head>
 
 <div class="text-column">
+	<!-- svelte-ignore empty-block -->
 	{#await getGames}
 	{:then games}
 		<p>Games</p>
