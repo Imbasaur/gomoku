@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Gomoku.DAL.Repository;
 public class GameRepository(GomokuDbContext dbContext) : BaseRepository<Game, int, GomokuDbContext>(dbContext), IGameRepository
 {
-    public async Task SetState(Guid code, GameState state)
+    public async Task SetStateAsync(Guid code, GameState state)
     {
         if (code.Equals(default))
             throw new ArgumentNullException(nameof(code));
@@ -18,7 +18,7 @@ public class GameRepository(GomokuDbContext dbContext) : BaseRepository<Game, in
         await Context.SaveChangesAsync();
     }
 
-    public async Task ConnectPlayer(Guid code, string playerName)
+    public async Task ConnectPlayerAsync(Guid code, string playerName)
     {
         if (code.Equals(default))
             throw new ArgumentNullException(nameof(code));
@@ -34,7 +34,7 @@ public class GameRepository(GomokuDbContext dbContext) : BaseRepository<Game, in
         await Context.SaveChangesAsync();
     }
 
-    public async Task<bool> AreBothPlayersConnected(Guid code)
+    public async Task<bool> AreBothPlayersConnectedAsync(Guid code)
     {
         if (code.Equals(default))
             throw new ArgumentNullException(nameof(code));

@@ -6,12 +6,12 @@ public interface IBaseRepository<TEntity, T>
     where TEntity : class, IEntity<T>, new()
     where T : IComparable, IEquatable<T>
 {
-    TEntity? Get(T id);
-    TEntity? Get(Expression<Func<TEntity, bool>> predicate);
-    IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>>? predicate = null);
-    void Add(TEntity entity);
-    void Update(TEntity entity);
-    void Delete(TEntity entity);
-    void Delete(Expression<Func<TEntity, bool>> predicate);
-    void DeleteMany(Expression<Func<TEntity, bool>> predicate);
+    Task<TEntity?> GetAsync(T id);
+    Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<List<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? predicate = null);
+    Task AddAsync(TEntity entity);
+    Task UpdateAsync(TEntity entity);
+    Task DeleteAsync(TEntity entity);
+    Task DeleteAsync(Expression<Func<TEntity, bool>> predicate);
+    Task DeleteManyAsync(Expression<Func<TEntity, bool>> predicate);
 }

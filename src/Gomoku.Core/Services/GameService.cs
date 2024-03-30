@@ -12,7 +12,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 {
     public async Task<GameCreatedDto> Create()
     {
-        var players = waitingListRepository.GetTop2();
+        var players = waitingListRepository.GetTop2Async();
 
         if (players == null || players.Count < 2)
             return null;
@@ -26,8 +26,8 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             State = GameState.Created
         };
 
-        repository.Add(game);
-        waitingListRepository.DeleteMany(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
+        repository.AddAsync(game);
+        waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
 
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.WhiteName); // todo: remove this, don't really need to update waitingList on frontend side
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.BlackName);
@@ -41,30 +41,30 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public Task<GameDto> Get(Guid gameCode)
     {
-        var game = repository.Get(x => x.Code == gameCode);
+        var game = repository.GetAsync(x => x.Code == gameCode);
 
         return Task.FromResult(mapper.Map<GameDto>(game));
     }
 
     public Task<IEnumerable<GameDto>> GetAll()
     {
-        var games = repository.GetMany();
+        var games = repository.GetManyAsync();
 
         return Task.FromResult(mapper.Map<IEnumerable<GameDto>>(games));
     }
 
     public async Task SetGameState(Guid code, GameState state)
     {
-        await repository.SetState(code, state);
+        await repository.SetStateAsync(code, state);
     }
 
     public async Task Join(Guid code, string playerName)
     {
-        await repository.ConnectPlayer(code, playerName);
+        await repository.ConnectPlayerAsync(code, playerName);
 
-        if (await repository.AreBothPlayersConnected(code))
+        if (await repository.AreBothPlayersConnectedAsync(code))
         {
-            await repository.SetState(code, GameState.PlayersConnected);
+            await repository.SetStateAsync(code, GameState.PlayersConnected);
             await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
         }
         else

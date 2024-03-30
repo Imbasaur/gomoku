@@ -4,6 +4,6 @@ using Gomoku.DAL.Repository.Abstract;
 namespace Gomoku.DAL.Repository;
 public interface IWaitingListRepository : IBaseRepository<PlayerWaiting, int>
 {
-    int Count();
-    List<string> GetTop2();
+    Task<int> CountAsync();
+    Task<List<string>> GetTop2Async();
 }

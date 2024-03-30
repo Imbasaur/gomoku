@@ -21,64 +21,64 @@ public abstract class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEn
         _context = context;
     }
 
-    public TEntity? Get(T id)
+    public Task<TEntity?> GetAsync(T id)
     {
         if (id.Equals(default))
             throw new ArgumentNullException(nameof(id));
 
-        return DbSet.SingleOrDefault(x => x.Id.Equals(id));
+        return DbSet.SingleOrDefaultAsync(x => x.Id.Equals(id));
     }
 
-    public TEntity? Get(Expression<Func<TEntity, bool>> predicate)
+    public Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        return DbSet.SingleOrDefault(predicate);
+        return DbSet.SingleOrDefaultAsync(predicate);
     }
 
-    public IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>>? predicate = null)
+    public Task<List<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
         return predicate != null
-            ? DbSet.Where(predicate).AsEnumerable()
-            : DbSet.AsEnumerable();
+            ? DbSet.Where(predicate).ToListAsync()
+            : DbSet.ToListAsync();
     }
 
-    public void Add(TEntity entity)
+    public async Task AddAsync(TEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        DbSet.Add(entity);
-        Context.SaveChanges();
+        await DbSet.AddAsync(entity);
+        await Context.SaveChangesAsync();
     }
 
-    public void Update(TEntity entity)
+    public async Task UpdateAsync(TEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
         DbSet.Update(entity);
-        Context.SaveChanges();
+        await Context.SaveChangesAsync();
     }
 
-    public void Delete(TEntity entity)
+    public async Task DeleteAsync(TEntity entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
         DbSet.Remove(entity);
-        Context.SaveChanges();
+        await Context.SaveChangesAsync();
     }
 
-    public void Delete(Expression<Func<TEntity, bool>> predicate)
+    public async Task DeleteAsync(Expression<Func<TEntity, bool>> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
-        var entity = DbSet.SingleOrDefault(predicate);
+        var entity = await DbSet.SingleOrDefaultAsync(predicate);
         ArgumentNullException.ThrowIfNull(entity);
         DbSet.Remove(entity);
-        Context.SaveChanges();
+        await Context.SaveChangesAsync();
     }
 
-    public void DeleteMany(Expression<Func<TEntity, bool>> predicate)
+    public async Task DeleteManyAsync(Expression<Func<TEntity, bool>> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
         var entity = DbSet.Where(predicate);
         ArgumentNullException.ThrowIfNull(entity);
         DbSet.RemoveRange(entity);
-        Context.SaveChanges();
+        await Context.SaveChangesAsync();
     }
 }
