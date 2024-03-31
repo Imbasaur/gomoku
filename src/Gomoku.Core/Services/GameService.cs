@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.SignalR;
 namespace Gomoku.Core.Services;
 public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> hub) : IGameService
 {
+    private readonly Dictionary<Guid, SemaphoreSlim> _joinLocks = [];
+
     public async Task<GameCreatedDto> Create()
     {
-        var players = waitingListRepository.GetTop2Async();
+        var players = await waitingListRepository.GetTop2Async();
 
         if (players == null || players.Count < 2)
             return null;
@@ -26,8 +28,8 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             State = GameState.Created
         };
 
-        repository.AddAsync(game);
-        waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
+        await repository.AddAsync(game);
+        await waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
 
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.WhiteName); // todo: remove this, don't really need to update waitingList on frontend side
         await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.BlackName);
@@ -60,14 +62,33 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task Join(Guid code, string playerName)
     {
-        await repository.ConnectPlayerAsync(code, playerName);
+        SemaphoreSlim joinLock;
 
-        if (await repository.AreBothPlayersConnectedAsync(code))
+        lock (_joinLocks)
         {
-            await repository.SetStateAsync(code, GameState.PlayersConnected);
-            await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+            if (!_joinLocks.ContainsKey(code))
+                _joinLocks[code] = new SemaphoreSlim(1, 1);
+
+            joinLock = _joinLocks[code];
         }
-        else
-            await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
+
+        await joinLock.WaitAsync();
+
+        try
+        {
+            await repository.ConnectPlayerAsync(code, playerName);
+
+            if (await repository.AreBothPlayersConnectedAsync(code))
+            {
+                await repository.SetStateAsync(code, GameState.PlayersConnected);
+                await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+            }
+            else
+                await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
+        }
+        finally
+        {
+            joinLock.Release();
+        }
     }
 }

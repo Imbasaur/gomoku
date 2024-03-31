@@ -9,7 +9,7 @@ public abstract class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEn
     where T : IComparable, IEquatable<T>
     where TContext : DbContext
 {
-    private TContext _context;
+    private readonly TContext _context;
     protected readonly DbSet<TEntity> DbSet;
     protected TContext Context { get { return _context; } }
 
