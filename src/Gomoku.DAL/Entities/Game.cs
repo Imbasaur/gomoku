@@ -14,4 +14,7 @@ public sealed class Game : IEntity<int>
     public bool IsWhiteConnected { get; set; }
     public bool IsBlackConnected { get; set; }
     public GameVariant Variant { get; set; }
+
+    // Concurrency token
+    public uint Version { get; set; }
 }

@@ -6,12 +6,11 @@ using Gomoku.DAL.Entities;
 using Gomoku.DAL.Enums;
 using Gomoku.DAL.Repository;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gomoku.Core.Services;
 public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> hub) : IGameService
 {
-    private readonly Dictionary<Guid, SemaphoreSlim> _joinLocks = [];
-
     public async Task<GameCreatedDto> Create()
     {
         var players = await waitingListRepository.GetTop2Async();
@@ -62,18 +61,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task Join(Guid code, string playerName)
     {
-        SemaphoreSlim joinLock;
-
-        lock (_joinLocks)
-        {
-            if (!_joinLocks.ContainsKey(code))
-                _joinLocks[code] = new SemaphoreSlim(1, 1);
-
-            joinLock = _joinLocks[code];
-        }
-
-        await joinLock.WaitAsync();
-
         try
         {
             await repository.ConnectPlayerAsync(code, playerName);
@@ -86,9 +73,34 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             else
                 await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
         }
-        finally
+        catch (DbUpdateConcurrencyException ex)
         {
-            joinLock.Release();
+            foreach (var entry in ex.Entries)
+            {
+                if (entry.Entity is Game)
+                {
+                    var proposedValues = entry.CurrentValues;
+                    var databaseValues = entry.GetDatabaseValues();
+
+                    proposedValues["IsBlackConnected"] = true;
+                    proposedValues["IsWhiteConnected"] = true;
+                    await repository.SetStateAsync(code, GameState.PlayersConnected);
+                    await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+
+                    // Refresh original values to bypass next concurrency check
+                    entry.OriginalValues.SetValues(databaseValues);
+                }
+                else
+                {
+                    throw new NotSupportedException(
+                        "Don't know how to handle concurrency conflicts for "
+                        + entry.Metadata.Name);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
         }
     }
 }

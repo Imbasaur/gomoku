@@ -28,5 +28,9 @@ public class GomokuDbContext : DbContext
         modelBuilder.Entity<PlayerWaiting>()
             .HasIndex(pw => pw.PlayerName)
             .IsUnique();
+
+        modelBuilder.Entity<Game>()
+            .Property(g => g.Version)
+            .IsRowVersion();
     }
 }
