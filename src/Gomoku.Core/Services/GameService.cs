@@ -40,18 +40,18 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         return mapper.Map<GameCreatedDto>(game);
     }
 
-    public Task<GameDto> Get(Guid gameCode)
+    public async Task<GameDto> Get(Guid gameCode)
     {
-        var game = repository.GetAsync(x => x.Code == gameCode);
+        var game = await repository.GetAsync(x => x.Code == gameCode);
 
-        return Task.FromResult(mapper.Map<GameDto>(game));
+        return mapper.Map<GameDto>(game);
     }
 
-    public Task<IEnumerable<GameDto>> GetAll()
+    public async Task<IEnumerable<GameDto>> GetAll()
     {
-        var games = repository.GetManyAsync();
+        var games = await repository.GetManyAsync();
 
-        return Task.FromResult(mapper.Map<IEnumerable<GameDto>>(games));
+        return mapper.Map<IEnumerable<GameDto>>(games);
     }
 
     public async Task SetGameState(Guid code, GameState state)
@@ -64,14 +64,13 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         try
         {
             await repository.ConnectPlayerAsync(code, playerName);
+            await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
 
             if (await repository.AreBothPlayersConnectedAsync(code))
             {
                 await repository.SetStateAsync(code, GameState.PlayersConnected);
                 await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
             }
-            else
-                await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
         }
         catch (DbUpdateConcurrencyException ex)
         {
@@ -84,11 +83,11 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
                     proposedValues["IsBlackConnected"] = true;
                     proposedValues["IsWhiteConnected"] = true;
-                    await repository.SetStateAsync(code, GameState.PlayersConnected);
+                    proposedValues["State"] = 2;
                     await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
 
-                    // Refresh original values to bypass next concurrency check
                     entry.OriginalValues.SetValues(databaseValues);
+                    await entry.Context.SaveChangesAsync();
                 }
                 else
                 {
@@ -97,10 +96,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                         + entry.Metadata.Name);
                 }
             }
-        }
-        catch (Exception ex)
-        {
-
         }
     }
 }
