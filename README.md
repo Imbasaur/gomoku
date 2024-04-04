@@ -22,6 +22,7 @@ If the goal will be ever completed...
 * Public API for accessing played games
 * Tournament system for private and public tournaments
 * Analysis of played games (maybe integration with game engines?)
+* Game variants (swap, swap2 etc)
 
 ## Technology
 * .Net on backend
