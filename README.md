@@ -23,6 +23,7 @@ If the goal will be ever completed...
 * Tournament system for private and public tournaments
 * Analysis of played games (maybe integration with game engines?)
 * Game variants (swap, swap2 etc)
+* Learn to play, puzzles
 
 ## Technology
 * .Net on backend
