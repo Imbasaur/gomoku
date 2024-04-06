@@ -27,7 +27,7 @@ If the goal will be ever completed...
 
 ## Technology
 * .Net on backend
-* Communication in WebSockets or MQTT (imagine integration with chess clock and interactive board IRL)
+* SignalR and web api to communicate between frontend and backend
 * TBC
 
 ## Contributing
