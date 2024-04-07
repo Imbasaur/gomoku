@@ -17,6 +17,7 @@ If the goal will be ever completed...
 
 * Ingame/global chat
 * Player accounts
+* Player/global statistics
 * Leaderboard + rating system
 * Saving/Loading games and playing them
 * Public API for accessing played games
