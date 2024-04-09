@@ -14,8 +14,24 @@
 	<title>About</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
-
 <div class="text-column">
+	
+
+<div class="grid">
+	{#each Array.from(Array(6).keys()) as row (row)}
+		<div class="row">
+			{#each Array.from(Array(5).keys()) as column (column)}
+				<div class="node">
+					<input name="guess" type="hidden" />
+				</div>
+			{/each}
+		</div>
+	{/each}
+</div>
+
+
+
+
 	<!-- svelte-ignore empty-block -->
 	{#await getGames}
 	{:then games}
