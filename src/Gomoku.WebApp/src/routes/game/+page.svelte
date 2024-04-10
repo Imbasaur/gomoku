@@ -35,12 +35,14 @@
 	<!-- svelte-ignore empty-block -->
 	{#await getGames}
 	{:then games}
+	{#if games.length != 0}
 		<p>Games</p>
 		<ul>
 			{#each games as game}
 				<li>Code: {game.code}, Black Name: {game.blackName}, White Name: {game.whiteName}</li>
 			{/each}
 		</ul>
+	{/if}
 	{:catch error}
 		<p>An error occurred.</p>
 	{/await}

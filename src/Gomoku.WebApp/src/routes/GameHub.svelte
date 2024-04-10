@@ -110,9 +110,11 @@
     }
 </script>
 
+{#if $player != ''}
 <div>
     <p>Player name is {$player}</p>
 </div>
+{/if}
 
 <button on:click={triggerPlayerReady}>
     {#if playerReady}
