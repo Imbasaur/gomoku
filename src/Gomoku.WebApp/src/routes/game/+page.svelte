@@ -3,7 +3,6 @@
 	import GameHub from '../GameHub.svelte';
     
     export let data: PageData;
-	const game = {}
 	const getGames = (async () => {
 		const response = await fetch('http://localhost:5190/Game')
 		return await response.json();
@@ -28,10 +27,6 @@
 		</div>
 	{/each}
 </div>
-
-
-
-
 	<!-- svelte-ignore empty-block -->
 	{#await getGames}
 	{:then games}

@@ -19,10 +19,12 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             return null;
 
         var gameCode = Guid.NewGuid();
+
+        var randomNumber = new Random().Next(0, 2);
         var game = new Game
         {
-            BlackName = players[0], // todo: have to add some randomisation here
-            WhiteName = players[1],
+            BlackName = players[randomNumber], // todo: have to add some randomisation here
+            WhiteName = players[randomNumber ^ 1],
             Code = gameCode,
             State = GameState.Created
         };
