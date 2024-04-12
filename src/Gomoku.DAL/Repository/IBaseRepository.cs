@@ -1,7 +1,7 @@
 ﻿using Gomoku.DAL.Abstract;
 using System.Linq.Expressions;
 
-namespace Gomoku.DAL.Repository.Abstract;
+namespace Gomoku.DAL.Repository;
 public interface IBaseRepository<TEntity, T>
     where TEntity : class, IEntity<T>, new()
     where T : IComparable, IEquatable<T>

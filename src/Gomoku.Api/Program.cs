@@ -1,4 +1,4 @@
-using Gomoku.Api.Hubs;
+using Gomoku.Core.Hubs;
 using Gomoku.DAL;
 using Gomoku.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;

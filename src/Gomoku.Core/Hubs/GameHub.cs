@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace Gomoku.Api.Hubs;
+namespace Gomoku.Core.Hubs;
 
 public class GameHub(ILogger<GameHub> logger) : Hub
 {

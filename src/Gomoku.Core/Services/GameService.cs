@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Gomoku.Api.Hubs;
 using Gomoku.Core.Dtos.Games;
+using Gomoku.Core.Hubs;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Entities;
 using Gomoku.DAL.Enums;
