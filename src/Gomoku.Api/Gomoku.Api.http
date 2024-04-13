@@ -1,11 +1,21 @@
-@Gomoku.Api_HostAddress = http://localhost:5194
+@Gomoku.Api_HostAddress = http://localhost:5190
 
 GET {{Gomoku.Api_HostAddress}}/Test/
 Accept: application/json
 
 ###
 
-POST {{Gomoku.Api_HostAddress}}/Game/
+GET {{Gomoku.Api_HostAddress}}/Game/
+Accept: application/json
+
+###
+
+GET {{Gomoku.Api_HostAddress}}/WaitingList/
+Accept: application/json
+
+###
+
+GET {{Gomoku.Api_HostAddress}}/WaitingList/count
 Accept: application/json
 
 ###
