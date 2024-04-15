@@ -29,6 +29,7 @@ If the goal will be ever completed...
 ## Technology
 * .Net on backend
 * SignalR and web api to communicate between frontend and backend
+* Frontent in Svelte
 * TBC
 
 ## Contributing
