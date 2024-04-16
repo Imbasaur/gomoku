@@ -16,6 +16,7 @@ This open-source project aims to provide a place for playing Gomoku for everyone
 If the goal will be ever completed...
 
 * Ingame/global chat
+* Private messages or private chat between players
 * Player accounts
 * Player/global statistics
 * Leaderboard + rating system
