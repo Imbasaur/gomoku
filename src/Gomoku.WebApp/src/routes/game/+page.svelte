@@ -16,13 +16,11 @@
 <div class="text-column">
 	
 
-<div class="grid">
-	{#each Array.from(Array(6).keys()) as row (row)}
-		<div class="row">
-			{#each Array.from(Array(5).keys()) as column (column)}
-				<div class="node">
-					<input name="guess" type="hidden" />
-				</div>
+<div id="board">
+	{#each Array.from(Array(3).keys()) as row (row)}
+		<div class="row{row}">
+			{#each Array.from(Array(3).keys()) as column (column)}
+				<div class="node" id="node{row}{column}">x</div>
 			{/each}
 		</div>
 	{/each}
@@ -43,6 +41,29 @@
 	{/await}
 	<GameHub />
 </div>
+
+<style>
+	#board {
+		margin-left: auto;
+		margin-right: auto;
+		width: 150px;
+		height: 150px;
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-gap: 10px;
+	}
+
+	.node {
+		width: 10px;
+		height: 10px;
+		border: 1px solid #D3D3D3;
+		background-color: #F5F5F5;
+		font-size: 40px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
 
 
 
