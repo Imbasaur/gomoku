@@ -17,10 +17,10 @@
 	
 
 <div id="board">
-	{#each Array.from(Array(3).keys()) as row (row)}
+	{#each Array.from(Array(15).keys()) as row (row)}
 		<div class="row{row}">
-			{#each Array.from(Array(3).keys()) as column (column)}
-				<div class="node" id="node{row}{column}">x</div>
+			{#each Array.from(Array(15).keys()) as column (column)}
+				<div class="node" id="node{row}{column}"></div>
 			{/each}
 		</div>
 	{/each}
@@ -46,18 +46,17 @@
 	#board {
 		margin-left: auto;
 		margin-right: auto;
-		width: 150px;
-		height: 150px;
+		width: 600px;
+		height: 600px;
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-gap: 10px;
+		grid-template-columns: repeat(15, 0fr);
 	}
 
 	.node {
-		width: 10px;
-		height: 10px;
-		border: 1px solid #D3D3D3;
-		background-color: #F5F5F5;
+		width: 30px;
+		height: 30px;
+		border: 1px solid #000000;
+		background-color: #ECB163;
 		font-size: 40px;
 		display: flex;
 		justify-content: center;
