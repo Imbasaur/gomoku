@@ -14,18 +14,7 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 <div class="text-column">
-	
 
-<div id="board">
-	{#each Array.from(Array(15).keys()) as column (column)}
-		<div class="column{column}">
-			{#each Array.from(Array(15).keys()) as row (row)}
-
-				<div class="node column-{column} row-{row}" id="node{column}{row}"></div>
-			{/each}
-		</div>
-	{/each}
-</div>
 	<!-- svelte-ignore empty-block -->
 	{#await getGames}
 	{:then games}
@@ -41,6 +30,17 @@
 		<p>An error occurred.</p>
 	{/await}
 	<GameHub />
+	
+	<div id="board">
+		{#each Array.from(Array(15).keys()) as column (column)}
+			<div class="column{column}">
+				{#each Array.from(Array(15).keys()) as row (row)}
+	
+					<div class="node column-{column} row-{row}" id="node{column}{row}"></div>
+				{/each}
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style>
