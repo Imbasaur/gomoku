@@ -8,10 +8,51 @@
 
     let blackTurn = true
 
-    function handleClick(column, row){
-        console.log("Node" + column + row +" clicked by " + blackTurn ? 'black' : 'white' + " player.")
-        document.getElementById("node" + column + row)?.classList.add(blackTurn ? 'black' : 'white')
+    function handleClick(column:number, row:number){
+        var color = blackTurn ? 'black' : 'white';
+        console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
+        document.getElementById("node" + column + 'x' + row)?.classList.add(color)
+        checkWin(column, row, color);
+
         blackTurn = !blackTurn;
+    }
+
+    function checkWin(column:number, row:number, color:string){
+        console.log("Checking win conditions for " + color + " on " + column + 'x' + row);
+        var fiveInARow = false
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0)
+                    continue;
+                
+                var count = 1 + checkDir(column, row, i, j, color)
+                if (count > 1 && count < 5){
+                    console.log("Found " + count + " stones, checking opposite direction")
+                    count += checkDir(column, row, 0-i, 0-j, color)
+                    break;
+                }
+
+                if (count >= 5)
+                    fiveInARow = true;
+            }
+            if (fiveInARow)
+                break;
+        }
+        
+        if (fiveInARow){
+            console.log("Found five in a row by " + color + "")
+            alert(color + " won the game");
+        }
+    }
+
+    function checkDir(column:number, row:number, x:number, y:number, color:string){
+        let c = 0;
+        console.log("Looking for " + color + " stone on " + (column + x) + "x" + (row + y));
+        if ((column + x) >= 0 && (column + x) <= 14 && (row + y) >= 0 && (row + y) <= 14 && document.getElementById("node" + (column + x) + 'x' + (row + y))?.classList.contains(color)){
+            console.log("Found next " + color + " stone on " + (column + x) + "x" + (row + y));
+            c = 1 + checkDir(column + x, row + y, x, y, color);
+        }
+        return c
     }
 </script>
 	
@@ -19,7 +60,7 @@
     {#each Array.from(Array(15).keys()) as column}
         <div class="column{column}">
             {#each Array.from(Array(15).keys()) as row}
-            <div class="node node{column}{row} column-{column} row-{row}" id="node{column}{row}" on:click|once={() => handleClick(column, row)}></div>
+            <div class="node node{column}x{row} column-{column} row-{row}" id="node{column}x{row}" on:click|once={() => handleClick(column, row)}></div>
             {/each}
         </div>
     {/each}
@@ -136,8 +177,8 @@
 	}
 
     /* Top left corner */
-	.node00::before,
-	.node00::after {
+	.node0x0::before,
+	.node0x0::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -146,7 +187,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.node00::after {
+	.node0x0::after {
 		left: 15px;
 		top: 15px;
 		width: 50%;
@@ -154,8 +195,8 @@
 	}
 
 	/* Bottom left corner */
-	#node014::before,
-	#node014::after {
+	#node0x14::before,
+	#node0x14::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -164,7 +205,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node014::after {
+	#node0x14::after {
 		left: 15px;
 		top: 15px;
 		width: 50%;
@@ -172,8 +213,8 @@
 	}
 
 	/* Top right corner */
-	#node140::before,
-	#node140::after {
+	#node14x0::before,
+	#node14x0::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -182,7 +223,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node140::after {
+	#node14x0::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
@@ -190,8 +231,8 @@
 	}
 
 	/* Top right corner */
-	#node1414::before,
-	#node1414::after {
+	#node14x14::before,
+	#node14x14::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -200,7 +241,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node1414::after {
+	#node14x14::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
