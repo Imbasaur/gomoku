@@ -12,7 +12,9 @@
         var color = blackTurn ? 'black' : 'white';
         console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
-        checkWin(column, row, color);
+        if (checkWin(column, row, color)){
+            alert(color + " won the game");
+        }
 
         blackTurn = !blackTurn;
     }
@@ -41,7 +43,7 @@
         
         if (fiveInARow){
             console.log("Found five in a row by " + color + "")
-            alert(color + " won the game");
+            return true;
         }
     }
 
