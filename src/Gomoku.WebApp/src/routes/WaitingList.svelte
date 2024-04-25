@@ -1,6 +1,5 @@
 <script lang="ts">
     import { player, waitingList } from "$lib/stores";
-    import createGame from './GameHub.svelte';
 
     export function joinWaitingList(playerName: string) {
         fetch("http://localhost:5190/WaitingList/join", {

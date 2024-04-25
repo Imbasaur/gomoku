@@ -1,15 +1,11 @@
 <script lang="ts">
-    import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-    import { onDestroy, createEventDispatcher } from 'svelte';
-    import WaitingList from "./WaitingList.svelte";
-    import joinWaitingList from './WaitingList.svelte'
-    import { waitingList, player } from "$lib/stores";
-	import Counter from "./Counter.svelte";
+    import { addMove}  from './GameHub.svelte';
 
     let blackTurn = true
 
     function handleClick(column:number, row:number){
         var color = blackTurn ? 'black' : 'white';
+        // addMove('1x0');
         console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
         if (checkWin(column, row, color)){
@@ -57,7 +53,6 @@
         return c
     }
 </script>
-	
 <div id="board">
     {#each Array.from(Array(15).keys()) as column}
         <div class="column{column}">

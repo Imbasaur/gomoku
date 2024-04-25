@@ -57,6 +57,10 @@
         console.log('Both players connected.');
     })
 
+    export function addMove(move: string){
+        connection.send('addMove', move);
+    }
+
     function removeFromWaitingListLocal(name: string){
         const index = $waitingList.indexOf(name, 0);
         if (index > -1) {
