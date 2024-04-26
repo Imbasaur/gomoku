@@ -5,7 +5,7 @@
 
     function handleClick(column:number, row:number){
         var color = blackTurn ? 'black' : 'white';
-        // addMove('1x0');
+        addMove('1x0');
         console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
         if (checkWin(column, row, color)){
