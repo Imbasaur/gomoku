@@ -37,10 +37,12 @@ public class GameController(IGameService gameService) : ControllerBase
         return Ok();
     }
 
-    //[HttpPost]
-    //[Route("move")]
-    //public async Task<IActionResult> AddMove(Guid code, string move)
-    //{
-    //    // todo: add move and call all signalr clients connected to game hub
-    //}
+    [HttpPost]
+    [Route("move")]
+    public async Task<IActionResult> AddMove(Guid code, int x, int y)
+    {
+        await gameService.Move(code, x, y);
+
+        return Ok();
+    }
 }

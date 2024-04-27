@@ -100,4 +100,11 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             }
         }
     }
+
+    public async Task Move(Guid code, int x, int y)
+    {
+        // todo: save move in db, change x,y to algebraic notation
+
+        await hub.Clients.Group(code.ToString()).SendAsync($"New move at {x},{y}");
+    }
 }

@@ -8,4 +8,5 @@ public interface IGameService
     Task<IEnumerable<GameDto>> GetAll();
     Task<GameDto> Get(Guid gameCode);
     Task Join(Guid code, string playerName);
+    Task Move(Guid code, int x, int y);
 }
