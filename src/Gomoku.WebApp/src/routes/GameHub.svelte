@@ -2,7 +2,7 @@
     import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
     import { onDestroy, createEventDispatcher } from 'svelte';
     import WaitingList from "./WaitingList.svelte";
-    import { waitingList, player } from "$lib/stores";
+    import { waitingList, player, gameCode } from "$lib/stores";
     
 
     const dispatch = createEventDispatcher();
@@ -43,6 +43,7 @@
 
     connection.on('GameCreated', name => {
         joinGame(name, $player)
+        $gameCode = name
         console.log('Game ' + name + ' created.');
     })
 
@@ -105,26 +106,6 @@
         })
         .catch(error => {
             console.error('Error creating game:', error.message);
-        });
-    }
-    
-    export function addMove(code: string, x: number, y: number) { 
-        fetch("http://localhost:5190/Game/move", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ code, x, y})
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add a move to the game')
-            }
-            console.log("Successfully added move the game.");
-            // anything else?
-        })
-        .catch(error => {
-            console.error('Error adding move to the game:', error.message);
         });
     }
 </script>

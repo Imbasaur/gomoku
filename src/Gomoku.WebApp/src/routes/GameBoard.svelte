@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { addMove}  from './GameHub.svelte';
+	import { gameCode } from "$lib/stores";
 
     let blackTurn = true
 
     function handleClick(column:number, row:number){
         var color = blackTurn ? 'black' : 'white';
-        addMove('1x0');
+        addMove(column, row);
         console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
         if (checkWin(column, row, color)){
@@ -51,6 +51,26 @@
             c = 1 + checkDir(column + x, row + y, x, y, color);
         }
         return c
+    }
+    
+    function addMove(x: number, y: number) {  // this should be signalr call
+        fetch("http://localhost:5190/Game/move", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ $gameCode, x, y})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add a move to the game')
+            }
+            console.log("Successfully added move the game.");
+            // anything else?
+        })
+        .catch(error => {
+            console.error('Error adding move to the game:', error.message);
+        });
     }
 </script>
 <div id="board">
