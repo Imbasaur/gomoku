@@ -6,7 +6,7 @@
     function handleClick(column:number, row:number){
         var color = blackTurn ? 'black' : 'white';
         addMove(column, row);
-        console.log("Node" + column + "x" + row +" clicked by " + color + " player.")
+        console.log("Node " + numToAlpha(column) + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
         if (checkWin(column, row, color)){
             alert(color + " won the game");
@@ -16,7 +16,7 @@
     }
 
     function checkWin(column:number, row:number, color:string){
-        console.log("Checking win conditions for " + color + " on " + column + 'x' + row);
+        console.log("Checking win conditions for " + color + " on " + numToAlpha(column) + row);
         var fiveInARow = false
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
@@ -45,9 +45,9 @@
 
     function checkDir(column:number, row:number, x:number, y:number, color:string){
         let c = 0;
-        console.log("Looking for " + color + " stone on " + (column + x) + "x" + (row + y));
-        if ((column + x) >= 0 && (column + x) <= 14 && (row + y) >= 0 && (row + y) <= 14 && document.getElementById("node" + (column + x) + 'x' + (row + y))?.classList.contains(color)){
-            console.log("Found next " + color + " stone on " + (column + x) + "x" + (row + y));
+        console.log("Looking for " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
+        if ((column + x) >= 1 && (column + x) <= 15 && (row + y) >= 1 && (row + y) <= 15 && document.getElementById("node" + (column + x) + 'x' + (row + y))?.classList.contains(color)){
+            console.log("Found next " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
             c = 1 + checkDir(column + x, row + y, x, y, color);
         }
         return c
@@ -72,12 +72,16 @@
             console.error('Error adding move to the game:', error.message);
         });
     }
+
+    function numToAlpha(n: number){
+        return String.fromCharCode(96 + n)
+    }
 </script>
 <div id="board">
     {#each Array.from(Array(15).keys()) as column}
-        <div class="column{column}">
+        <div class="column{1+column}">
             {#each Array.from(Array(15).keys()) as row}
-            <div class="node node{column}x{row} column-{column} row-{row}" id="node{column}x{row}" on:click|once={() => handleClick(column, row)}></div>
+            <div class="node node{1+column}x{15-row} column-{1+column} row-{15-row}" id="node{1+column}x{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
             {/each}
         </div>
     {/each}
@@ -126,7 +130,7 @@
     }
 
 	/* Left border */ 
-	.column-0::after{
+	.column-1::after{
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -135,7 +139,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.column-0::after{
+	.column-1::after{
 			left: 15px;
 			top: 15px;
 			width: 50%;
@@ -143,7 +147,7 @@
 	}
 
 	/* Right border */ 
-	.column-14::before{
+	.column-15::before{
 		content: '';
 		position: absolute;
 		top: 0;
@@ -152,7 +156,7 @@
 		height: 100%;
 		background-color: #000000;
 	}
-	.column-14::after{
+	.column-15::after{
 		left: 0;
 		top: 15px;
 		width: 50%;
@@ -160,7 +164,7 @@
 	}
 
 	/* Top border */ 
-	.row-0::before{
+	.row-15::before{
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -169,7 +173,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.row-0::after{
+	.row-15::after{
 			left: 0;
 			top: 15px;
 			width: 100%;
@@ -177,7 +181,7 @@
 	}
 
 	/* Bottom border */ 
-	.row-14::before{
+	.row-1::before{
 		content: '';
 		position: absolute;
 		top: 0;
@@ -186,7 +190,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.row-14::after{
+	.row-1::after{
 		left: 0;
 		top: 15px;
 		width: 100%;
@@ -194,8 +198,8 @@
 	}
 
     /* Top left corner */
-	.node0x0::before,
-	.node0x0::after {
+	.node1x15::before,
+	.node1x15::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -204,7 +208,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.node0x0::after {
+	.node1x15::after {
 		left: 15px;
 		top: 15px;
 		width: 50%;
@@ -212,8 +216,8 @@
 	}
 
 	/* Bottom left corner */
-	#node0x14::before,
-	#node0x14::after {
+	#node1x1::before,
+	#node1x1::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -222,7 +226,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node0x14::after {
+	#node1x1::after {
 		left: 15px;
 		top: 15px;
 		width: 50%;
@@ -230,8 +234,8 @@
 	}
 
 	/* Top right corner */
-	#node14x0::before,
-	#node14x0::after {
+	#node15x15::before,
+	#node15x15::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -240,16 +244,16 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node14x0::after {
+	#node15x15::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
 		height: 1px;
 	}
 
-	/* Top right corner */
-	#node14x14::before,
-	#node14x14::after {
+	/* Bottom right corner */
+	#node15x1::before,
+	#node15x1::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -258,7 +262,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node14x14::after {
+	#node15x1::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
