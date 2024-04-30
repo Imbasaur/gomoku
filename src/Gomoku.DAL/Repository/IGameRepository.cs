@@ -7,4 +7,5 @@ public interface IGameRepository : IBaseRepository<Game, int>
     Task SetStateAsync(Guid code, GameState state);
     Task ConnectPlayerAsync(Guid code, string playerName);
     Task<bool> AreBothPlayersConnectedAsync(Guid code);
+    Task AddMoveAsync(Guid code, string move);
 }

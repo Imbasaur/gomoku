@@ -44,4 +44,17 @@ public class GameRepository(GomokuDbContext dbContext) : BaseRepository<Game, in
 
         return entity.IsBlackConnected && entity.IsWhiteConnected;
     }
+
+    public async Task AddMoveAsync(Guid code, string move)
+    {
+        if (code.Equals(default))
+            throw new ArgumentNullException(nameof(code));
+
+        var entity = await DbSet.SingleOrDefaultAsync(x => x.Code == code);
+        ArgumentNullException.ThrowIfNull(entity);
+
+        entity.Moves += move;
+
+        await Context.SaveChangesAsync();
+    }
 }
