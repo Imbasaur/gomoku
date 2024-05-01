@@ -57,6 +57,11 @@
         console.log('Both players connected.');
     })
 
+    connection.on('MoveAdded', () => {
+        // todo: add move to board
+        console.log('Both players connected.');
+    })
+
     function removeFromWaitingListLocal(name: string){
         const index = $waitingList.indexOf(name, 0);
         if (index > -1) {

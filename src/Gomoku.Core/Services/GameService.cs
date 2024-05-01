@@ -105,6 +105,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     {
         await repository.AddMoveAsync(code, move);
 
-        await hub.Clients.Group(code.ToString()).SendAsync($"New move at {move}");
+        await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", $"New move at {move}");
     }
 }
