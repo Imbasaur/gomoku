@@ -5,7 +5,7 @@
 
     function handleClick(column:number, row:number){
         var color = blackTurn ? 'black' : 'white';
-        addMove(column, row);
+        addMove(numToAlpha(column) + row);
         console.log("Node " + numToAlpha(column) + row +" clicked by " + color + " player.")
         document.getElementById("node" + column + 'x' + row)?.classList.add(color)
         if (checkWin(column, row, color)){
@@ -53,13 +53,13 @@
         return c
     }
     
-    function addMove(x: number, y: number) {  // this should be signalr call
+    function addMove(move: string) {  // this should be signalr call
         fetch("http://localhost:5190/Game/move", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ $gameCode, x, y})
+            body: JSON.stringify({ $gameCode, move})
         })
         .then(response => {
             if (!response.ok) {

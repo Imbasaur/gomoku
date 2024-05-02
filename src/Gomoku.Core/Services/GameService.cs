@@ -101,7 +101,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         }
     }
 
-    public async Task Move(Guid code, string move)
+    public async Task AddMove(Guid code, string move)
     {
         await repository.AddMoveAsync(code, move);
 
