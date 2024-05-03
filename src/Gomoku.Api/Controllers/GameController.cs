@@ -39,9 +39,10 @@ public class GameController(IGameService gameService) : ControllerBase
 
     [HttpPost]
     [Route("move")]
-    public async Task<IActionResult> AddMove(Guid code, string move)
+    public async Task<IActionResult> AddMove(AddMoveRequest request)
     {
-        await gameService.AddMove(code, move);
+        // todo: add move verification (player, color, unique move) and return correct code
+        await gameService.AddMove(request.Code, request.Move);
 
         return Ok();
     }

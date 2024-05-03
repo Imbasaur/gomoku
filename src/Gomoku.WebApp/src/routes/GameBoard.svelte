@@ -59,7 +59,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ $gameCode, move})
+            body: JSON.stringify({ code: $gameCode, move})
         })
         .then(response => {
             if (!response.ok) {
