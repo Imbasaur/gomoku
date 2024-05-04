@@ -103,6 +103,12 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task AddMove(Guid code, string move)
     {
+        var game = await repository.GetAsync(x => x.Code  == code);
+        ArgumentNullException.ThrowIfNull(game);
+
+        if (game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
+            throw new Exception("Move already added"); // todo: make custom exception with codes
+
         await repository.AddMoveAsync(code, move);
 
         await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", $"New move at {move}");
