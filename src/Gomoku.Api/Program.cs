@@ -1,6 +1,7 @@
 using Gomoku.Core.Hubs;
 using Gomoku.DAL;
 using Gomoku.Infrastructure.Configuration;
+using Gomoku.Infrastructure.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("CorsPolicy");
 
 app.UseAuthorization();

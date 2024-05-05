@@ -41,7 +41,6 @@ public class GameController(IGameService gameService) : ControllerBase
     [Route("move")]
     public async Task<IActionResult> AddMove(AddMoveRequest request)
     {
-        // todo: add move verification (player, color) and return correct code
         await gameService.AddMove(request.Code, request.Move);
 
         return Ok();

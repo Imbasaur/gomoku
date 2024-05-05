@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Gomoku.Core.Dtos.Games;
+using Gomoku.Core.Exceptions;
 using Gomoku.Core.Hubs;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Entities;
@@ -106,8 +107,10 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var game = await repository.GetAsync(x => x.Code  == code);
         ArgumentNullException.ThrowIfNull(game);
 
-        if (game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
-            throw new Exception("Move already added"); // todo: make custom exception with codes
+        if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
+            throw new GameMoveExistsException();
+
+        // todo: add move verification (player, color)
 
         await repository.AddMoveAsync(code, move);
 
