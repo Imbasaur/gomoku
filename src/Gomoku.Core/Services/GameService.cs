@@ -110,7 +110,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
-        // todo: add move verification (player, color)
+        // todo: add move verification (player, color)  
 
         await repository.AddMoveAsync(code, move);
 
