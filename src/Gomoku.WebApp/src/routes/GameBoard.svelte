@@ -81,7 +81,7 @@
     {#each Array.from(Array(15).keys()) as column}
         <div class="column{1+column}">
             {#each Array.from(Array(15).keys()) as row}
-            <div class="node node{1+column}x{15-row} column-{1+column} row-{15-row}" id="node{1+column}x{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
+            <div class="node {numToAlpha(column+1)}{15-row} node{1+column}x{15-row} column-{1+column} row-{15-row}" id="node{1+column}x{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
             {/each}
         </div>
     {/each}

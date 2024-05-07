@@ -2,7 +2,7 @@
     import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
     import { onDestroy, createEventDispatcher } from 'svelte';
     import WaitingList from "./WaitingList.svelte";
-    import { waitingList, player, gameCode } from "$lib/stores";
+    import { waitingList, player, gameCode, moves, latestMove } from "$lib/stores";
     
 
     const dispatch = createEventDispatcher();
@@ -57,9 +57,12 @@
         console.log('Both players connected.');
     })
 
-    connection.on('MoveAdded', () => {
+    connection.on('MoveAdded', move => {
         // todo: add move to board
-        console.log('Both players connected.');
+        $latestMove = move;
+        $moves = $moves + move;
+        console.log('Move added at ' + move + '.');
+        console.log('Moves so far: ' + $moves);
     })
 
     function removeFromWaitingListLocal(name: string){
