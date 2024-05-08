@@ -60,7 +60,7 @@
     connection.on('MoveAdded', move => {
         // todo: add move to board
         $latestMove = move;
-        $moves = $moves + move;
+        $moves = [...$moves, move];
         console.log('Move added at ' + move + '.');
         console.log('Moves so far: ' + $moves);
     })

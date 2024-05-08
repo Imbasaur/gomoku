@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameCode } from "$lib/stores";
+	import { gameCode, moves } from "$lib/stores";
 
     let blackTurn = true
 
@@ -79,9 +79,9 @@
 </script>
 <div id="board">
     {#each Array.from(Array(15).keys()) as column}
-        <div class="column{1+column}">
+        <div class="{numToAlpha(column+1)}">
             {#each Array.from(Array(15).keys()) as row}
-            <div class="node {numToAlpha(column+1)}{15-row} node{1+column}x{15-row} column-{1+column} row-{15-row}" id="node{1+column}x{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
+                <div class:test={$moves.filter(e => e === numToAlpha(column+1)+(15-row)).length > 0} class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
             {/each}
         </div>
     {/each}
@@ -130,7 +130,7 @@
     }
 
 	/* Left border */ 
-	.column-1::after{
+	.column-a::after{
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -139,7 +139,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.column-1::after{
+	.column-a::after{
 			left: 15px;
 			top: 15px;
 			width: 50%;
@@ -147,7 +147,7 @@
 	}
 
 	/* Right border */ 
-	.column-15::before{
+	.column-o::before{
 		content: '';
 		position: absolute;
 		top: 0;
@@ -156,7 +156,7 @@
 		height: 100%;
 		background-color: #000000;
 	}
-	.column-15::after{
+	.column-o::after{
 		left: 0;
 		top: 15px;
 		width: 50%;
@@ -198,8 +198,8 @@
 	}
 
     /* Top left corner */
-	.node1x15::before,
-	.node1x15::after {
+	.node-a15::before,
+	.node-a15::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -208,25 +208,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	.node1x15::after {
-		left: 15px;
-		top: 15px;
-		width: 50%;
-		height: 1px;
-	}
-
-	/* Bottom left corner */
-	#node1x1::before,
-	#node1x1::after {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 15px;
-		width: 1px;
-		height: 50%;
-		background-color: #000000;
-	}
-	#node1x1::after {
+	.node-a15::after {
 		left: 15px;
 		top: 15px;
 		width: 50%;
@@ -234,8 +216,8 @@
 	}
 
 	/* Top right corner */
-	#node15x15::before,
-	#node15x15::after {
+	#node-o15::before,
+	#node-o15::after {
 		content: '';
 		position: absolute;
 		top: 15px;
@@ -244,7 +226,7 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node15x15::after {
+	#node-o15::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
@@ -252,8 +234,8 @@
 	}
 
 	/* Bottom right corner */
-	#node15x1::before,
-	#node15x1::after {
+	#node-o1::before,
+	#node-o1::after {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -262,12 +244,30 @@
 		height: 50%;
 		background-color: #000000;
 	}
-	#node15x1::after {
+	#node-o1::after {
 		left: 0;
 		top: 15px;
 		width: 50%;
 		height: 1px;
 	}
+
+    /* Bottom left corner */
+    #node-a1::before,
+    #node-a1::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 15px;
+        width: 1px;
+        height: 50%;
+        background-color: #000000;
+    }
+    #node-a1::after {
+        left: 15px;
+        top: 15px;
+        width: 50%;
+        height: 1px;
+    }
 
     .black::after {
         left: 3px;
@@ -285,6 +285,16 @@
         height: 24px;
         width: 24px;
         background-color: white;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .test::after {
+        left: 3px;
+        top: 3px;
+        height: 24px;
+        width: 24px;
+        background-color: rgb(255, 0, 0);
         border-radius: 50%;
         display: inline-block;
     }
