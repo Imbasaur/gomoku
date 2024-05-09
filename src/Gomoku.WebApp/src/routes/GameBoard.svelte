@@ -1,57 +1,56 @@
 <script lang="ts">
 	import { gameCode, moves } from "$lib/stores";
 
-    let blackTurn = true
+    // let blackTurn = true
 
     function handleClick(column:number, row:number){
-        var color = blackTurn ? 'black' : 'white';
+        // var color = blackTurn ? 'black' : 'white';
         addMove(numToAlpha(column) + row);
-        console.log("Node " + numToAlpha(column) + row +" clicked by " + color + " player.")
-        document.getElementById("node" + column + 'x' + row)?.classList.add(color)
-        if (checkWin(column, row, color)){
-            alert(color + " won the game");
-        }
+        console.log("Clientside - Node " + numToAlpha(column) + row )
+        // if (checkWin(column, row, color)){
+        //     alert(color + " won the game");
+        // }
 
-        blackTurn = !blackTurn;
+        // blackTurn = !blackTurn;
     }
 
-    function checkWin(column:number, row:number, color:string){
-        console.log("Checking win conditions for " + color + " on " + numToAlpha(column) + row);
-        var fiveInARow = false
-        for (let i = -1; i <= 1; i++) {
-            for (let j = -1; j <= 1; j++) {
-                if (i == 0 && j == 0)
-                    continue;
+    // function checkWin(column:number, row:number, color:string){
+    //     console.log("Checking win conditions for " + color + " on " + numToAlpha(column) + row);
+    //     var fiveInARow = false
+    //     for (let i = -1; i <= 1; i++) {
+    //         for (let j = -1; j <= 1; j++) {
+    //             if (i == 0 && j == 0)
+    //                 continue;
                 
-                var count = 1 + checkDir(column, row, i, j, color)
-                if (count > 1 && count < 5){
-                    console.log("Found " + count + " stones, checking opposite direction")
-                    count += checkDir(column, row, 0-i, 0-j, color)
-                    break;
-                }
+    //             var count = 1 + checkDir(column, row, i, j, color)
+    //             if (count > 1 && count < 5){
+    //                 console.log("Found " + count + " stones, checking opposite direction")
+    //                 count += checkDir(column, row, 0-i, 0-j, color)
+    //                 break;
+    //             }
 
-                if (count >= 5)
-                    fiveInARow = true;
-            }
-            if (fiveInARow)
-                break;
-        }
+    //             if (count >= 5)
+    //                 fiveInARow = true;
+    //         }
+    //         if (fiveInARow)
+    //             break;
+    //     }
         
-        if (fiveInARow){
-            console.log("Found five in a row by " + color + "")
-            return true;
-        }
-    }
+    //     if (fiveInARow){
+    //         console.log("Found five in a row by " + color + "")
+    //         return true;
+    //     }
+    // }
 
-    function checkDir(column:number, row:number, x:number, y:number, color:string){
-        let c = 0;
-        console.log("Looking for " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
-        if ((column + x) >= 1 && (column + x) <= 15 && (row + y) >= 1 && (row + y) <= 15 && document.getElementById("node" + (column + x) + 'x' + (row + y))?.classList.contains(color)){
-            console.log("Found next " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
-            c = 1 + checkDir(column + x, row + y, x, y, color);
-        }
-        return c
-    }
+    // function checkDir(column:number, row:number, x:number, y:number, color:string){
+    //     let c = 0;
+    //     console.log("Looking for " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
+    //     if ((column + x) >= 1 && (column + x) <= 15 && (row + y) >= 1 && (row + y) <= 15 && document.getElementById("node" + (column + x) + 'x' + (row + y))?.classList.contains(color)){
+    //         console.log("Found next " + color + " stone on " + (numToAlpha(column + x)) + "x" + (row + y));
+    //         c = 1 + checkDir(column + x, row + y, x, y, color);
+    //     }
+    //     return c
+    // }
     
     function addMove(move: string) {  // this should be signalr call
         fetch("http://localhost:5190/Game/move", {
@@ -76,12 +75,40 @@
     function numToAlpha(n: number){
         return String.fromCharCode(96 + n)
     }
+    function getCurrentPlayerColor(node: string){
+        let index = $moves.findIndex(i => i === node);
+        console.log($moves)
+        console.log(index)
+        if (index <= 0)
+            return "";
+
+        if (index % 2 == 1)
+            return "black";
+        else
+            return "white";
+    }
+
+    function getColor(index: number){
+        if (index % 2 == 1)
+            return "black"
+        return "white"
+    }
+    
+    function addStone(node: string, index: number){
+        console.log('Adding stone on ' + node)
+        document.getElementById("node-" + node)?.classList.add(getColor(index))
+    }
+
+    $: $moves.forEach((v, i) => addStone(v, i))
+
+
 </script>
 <div id="board">
     {#each Array.from(Array(15).keys()) as column}
         <div class="{numToAlpha(column+1)}">
             {#each Array.from(Array(15).keys()) as row}
-                <div class:test={$moves.filter(e => e === numToAlpha(column+1)+(15-row)).length > 0} class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
+                <div class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
+                <!-- <div class:test={$moves.filter(e => e === numToAlpha(column+1)+(15-row)).length > 0} class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div> -->
             {/each}
         </div>
     {/each}

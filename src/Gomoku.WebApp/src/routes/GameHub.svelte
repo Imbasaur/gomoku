@@ -61,9 +61,15 @@
         // todo: add move to board
         $latestMove = move;
         $moves = [...$moves, move];
-        console.log('Move added at ' + move + '.');
-        console.log('Moves so far: ' + $moves);
+        console.log('Serverside - Move added at ' + move + ' by ' + getcolor() + '.');
+        console.log('Serverside - Moves so far: ' + $moves);
     })
+
+    function getcolor(){
+        if ($moves.length % 2 == 1)
+            return "black"
+        return "white"
+    }
 
     function removeFromWaitingListLocal(name: string){
         const index = $waitingList.indexOf(name, 0);
