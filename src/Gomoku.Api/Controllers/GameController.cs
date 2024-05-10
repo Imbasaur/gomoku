@@ -41,6 +41,7 @@ public class GameController(IGameService gameService) : ControllerBase
     [Route("move")]
     public async Task<IActionResult> AddMove(AddMoveRequest request)
     {
+        // todo: add fluent validation on move and everywhere
         await gameService.AddMove(request.Code, request.Move);
 
         return Ok();

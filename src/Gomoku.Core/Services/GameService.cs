@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Gomoku.Core.Dtos.Games;
 using Gomoku.Core.Exceptions;
+using Gomoku.Core.Extensions;
 using Gomoku.Core.Hubs;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Entities;
@@ -104,6 +105,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task AddMove(Guid code, string move)
     {
+        // move will be validated already validated
         var game = await repository.GetAsync(x => x.Code  == code);
         ArgumentNullException.ThrowIfNull(game);
 
@@ -114,6 +116,16 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
         await repository.AddMoveAsync(code, move);
 
+        if (IsWinningMove(move, game.Moves.GetLastPlayerMoves()))
+            // handle game win
+
         await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
+    }
+
+    // this is 1:1 what i did on front, but it had more sense there because we were scanning 2d array, not list of moves
+    // todo: find better way to check wining move, this is extremly ugly
+    private static bool IsWinningMove(string move, IEnumerable<string> moves)
+    {
+        return false;
     }
 }
