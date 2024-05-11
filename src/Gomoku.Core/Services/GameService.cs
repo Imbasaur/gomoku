@@ -72,8 +72,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
             if (await repository.AreBothPlayersConnectedAsync(code))
             {
-                await repository.SetStateAsync(code, GameState.PlayersConnected);
+                await repository.SetStateAsync(code, GameState.PlayersConnected); // todo: can we just skip playersConnected or there is something to do in between
                 await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+                await repository.SetStateAsync(code, GameState.Started);
             }
         }
         catch (DbUpdateConcurrencyException ex)
@@ -89,6 +90,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                     proposedValues["IsWhiteConnected"] = true;
                     proposedValues["State"] = 2;
                     await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+                    proposedValues["State"] = 3;
 
                     entry.OriginalValues.SetValues(databaseValues);
                     await entry.Context.SaveChangesAsync();
@@ -109,13 +111,16 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var game = await repository.GetAsync(x => x.Code  == code);
         ArgumentNullException.ThrowIfNull(game);
 
+        if (game.State != GameState.Started)
+            throw new GameMoveIncorrectStateException();
+
         if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
         // todo: add move verification (player, color)  
 
-        //await repository.AddMoveAsync(code, move);
         game.Moves += move;
+        await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
         var movesList = game.Moves.SplitMoves().ToList();
         var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count() - 1) % 2));
@@ -124,12 +129,10 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         {
             var blackWon = movesList.IndexOf(move) % 2 == 0;
             var winnerName = blackWon ? game.BlackName : game.WhiteName;
-            await hub.Clients.Group(code.ToString()).SendAsync("Game finished", winnerName);
+            await hub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
             game.Winner = winnerName;
             game.State = GameState.Finished;
         }
-        else
-            await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
         await repository.UpdateAsync(game);
     }

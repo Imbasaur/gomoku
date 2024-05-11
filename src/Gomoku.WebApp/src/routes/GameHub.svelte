@@ -61,8 +61,14 @@
         // todo: add move to board
         $latestMove = move;
         $moves = [...$moves, move];
-        console.log('Serverside - Move added at ' + move + ' by ' + getcolor() + '.');
-        console.log('Serverside - Moves so far: ' + $moves);
+        console.log('SignalR - Move added at ' + move + ' by ' + getcolor() + '.');
+        console.log('SignalR - Moves so far: ' + $moves);
+    })
+
+    connection.on('GameFinished', winner => {
+        console.log('SignalR - Game finished and the winner is  ' + winner);
+        alert(winner + ' won the game!')
+        // todo: disable board, allow to make new game
     })
 
     function getcolor(){
