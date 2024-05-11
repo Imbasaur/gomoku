@@ -114,18 +114,62 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
         // todo: add move verification (player, color)  
 
-        await repository.AddMoveAsync(code, move);
+        //await repository.AddMoveAsync(code, move);
+        game.Moves += move;
 
-        if (IsWinningMove(move, game.Moves.GetLastPlayerMoves()))
-            // handle game win
+        var movesList = game.Moves.SplitMoves().ToList();
+        var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count() - 1) % 2));
 
-        await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
+        if (isWinningMove)
+        {
+            var blackWon = movesList.IndexOf(move) % 2 == 0;
+            var winnerName = blackWon ? game.BlackName : game.WhiteName;
+            await hub.Clients.Group(code.ToString()).SendAsync("Game finished", winnerName);
+            game.Winner = winnerName;
+            game.State = GameState.Finished;
+        }
+        else
+            await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
+
+        await repository.UpdateAsync(game);
     }
 
-    // this is 1:1 what i did on front, but it had more sense there because we were scanning 2d array, not list of moves
     // todo: find better way to check wining move, this is extremly ugly
     private static bool IsWinningMove(string move, IEnumerable<string> moves)
     {
+        var x = move[0];
+        var y = int.Parse(move[1..]);
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = 1; j >= -1; j--) // to scan top-bottom
+            {
+                if (i == 0 && j == 0)
+                    continue;
+
+                var count = 1 + CheckStonesInDirection(x, y, i, j, moves);
+
+                if (count > 1 && count < 5)
+                {
+                    _ = CheckStonesInDirection(x, y, 0 - i, 0 - j, moves); // todo: fix, doesn't work
+                    break;
+                }
+
+                if (count >= 5)
+                    return true;
+            }
+        }
+
         return false;
+    }
+
+    private static int CheckStonesInDirection(char posX, int posY, int x, int y, IEnumerable<string> moves)
+    {
+        var count = 0;
+        var moveToCheck = $"{(char)(posX + x)}{posY + y}";
+        if ((posX + x) >= 'a' && (posX + x) <= 'o' && (posY + y) >= 1 && (posY + y) <= 15 && moves.Contains(moveToCheck))
+            count = 1 + CheckStonesInDirection((char)(posX + x), posY + y, x, y, moves);
+
+        return count;
     }
 }
