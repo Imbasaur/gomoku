@@ -41,7 +41,8 @@
         document.getElementById("node-" + node)?.classList.add(getColor(index))
     }
 
-    $: $moves.forEach((v, i) => addStone(v, i))
+    $: if ($moves.length > 0)
+        addStone($moves[$moves.length - 1], $moves.length)
 
 
 </script>
