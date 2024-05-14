@@ -7,6 +7,7 @@
     }
     
     function addMove(move: string) {  // this should be signalr call
+        console.log("code is " + $gameCode);
         fetch("http://localhost:5190/Game/move", {
             method: 'POST',
             headers: {
@@ -43,7 +44,6 @@
 
     $: if ($moves.length > 0)
         addStone($moves[$moves.length - 1], $moves.length)
-
 
 </script>
 <div id="board">
