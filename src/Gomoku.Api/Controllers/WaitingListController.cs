@@ -18,7 +18,7 @@ public class WaitingListController(IWaitingListService waitingListService) : Con
     [Route("join")]
     public async Task<IActionResult> JoinWaitingList(JoinWaitingListRequest player)
     {
-        await waitingListService.Add(player.PlayerName);
+        await waitingListService.Add(player.PlayerName, string.Empty); // remove this call later
 
         return Ok();
     }

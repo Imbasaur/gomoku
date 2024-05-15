@@ -14,7 +14,7 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
     {
         await repository.AddAsync(new PlayerWaiting(playerName, connectionId));
 
-        await hub.Clients.AllExcept(connectionId).SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
+        await hub.Clients.All.SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
 
         if (await repository.CountAsync() > 1)
             await gameService.Create();
@@ -35,11 +35,11 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
         return mapper.Map<IEnumerable<PlayerWaitingDto>>(players);
     }
 
-    public async Task Remove(string playerName)
+    public async Task Remove(string connectionId)
     {
-        await repository.DeleteAsync(x => x.PlayerName.ToLower().Equals(playerName.ToLower())); // this will be id in future
+        await repository.DeleteAsync(x => x.ConnectionId.ToLower().Equals(connectionId.ToLower())); // this will be account id in future
 
-        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", playerName);
+        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", connectionId);
 
         return;
     }

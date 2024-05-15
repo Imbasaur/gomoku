@@ -15,6 +15,9 @@ public class GomokuDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+#if DEBUG
+        optionsBuilder.EnableSensitiveDataLogging(true);
+#endif
         if (!optionsBuilder.IsConfigured)
         {
             optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=postgres;Username=postgres;Password=1d#f%gdsVC45#!!");

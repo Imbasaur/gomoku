@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gomoku.Core.Services;
-public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> hub) : IGameService
+public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> gameHub) : IGameService
 {
     public async Task<GameCreatedDto> Create()
     {
@@ -25,21 +25,19 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var randomNumber = new Random().Next(0, 2);
         var game = new Game
         {
-            BlackName = players[randomNumber],
-            WhiteName = players[randomNumber ^ 1],
+            BlackName = players[randomNumber].PlayerName,
+            WhiteName = players[randomNumber ^ 1].PlayerName,
             Code = gameCode,
             State = GameState.Created
         };
 
         await repository.AddAsync(game);
-        await waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0] || x.PlayerName == players[1]);
+        await waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0].PlayerName || x.PlayerName == players[1].PlayerName);
 
-        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.WhiteName); // todo: remove this, don't really need to update waitingList on frontend side
-        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", game.BlackName);
+        await gameHub.Clients.Client(players[0].ConnectionId).SendAsync("GameCreated", game.Code);
+        await gameHub.Clients.Client(players[1].ConnectionId).SendAsync("GameCreated", game.Code); // how to handle observers, add them to gorup? is there any limit in groups?
 
-        await hub.Groups.AddToGroupAsync(game.WhiteName, game.Code.ToString());
-        await hub.Groups.AddToGroupAsync(game.BlackName, game.Code.ToString());
-        await hub.Clients.Group(game.Code.ToString()).SendAsync("GameCreated", game.Code); // how to handle observers, add them to gorup? is there any limit in groups?
+        // todo: disconnect clients?
 
         return mapper.Map<GameCreatedDto>(game);
     }
@@ -63,17 +61,18 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         await repository.SetStateAsync(code, state);
     }
 
-    public async Task Join(Guid code, string playerName)
+    public async Task Join(Guid code, string playerName, string connectionId = null) // remove = null after removing http call
     {
         try
         {
             await repository.ConnectPlayerAsync(code, playerName);
-            await hub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
+            await gameHub.Groups.AddToGroupAsync(connectionId, code.ToString());
+            await gameHub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
 
             if (await repository.AreBothPlayersConnectedAsync(code))
             {
                 await repository.SetStateAsync(code, GameState.PlayersConnected); // todo: can we just skip playersConnected or there is something to do in between
-                await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+                await gameHub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
                 await repository.SetStateAsync(code, GameState.Started);
             }
         }
@@ -89,7 +88,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                     proposedValues["IsBlackConnected"] = true;
                     proposedValues["IsWhiteConnected"] = true;
                     proposedValues["State"] = 2;
-                    await hub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+                    await gameHub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
                     proposedValues["State"] = 3;
 
                     entry.OriginalValues.SetValues(databaseValues);
@@ -120,7 +119,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         // todo: add move verification (player, color)  
 
         game.Moves += move;
-        await hub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
+        await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
         var movesList = game.Moves.SplitMoves().ToList();
         var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count() - 1) % 2));
@@ -129,7 +128,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         {
             var blackWon = movesList.IndexOf(move) % 2 == 0;
             var winnerName = blackWon ? game.BlackName : game.WhiteName;
-            await hub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
+            await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
             game.Winner = winnerName;
             game.State = GameState.Finished;
         }
