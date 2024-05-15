@@ -25,7 +25,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var randomNumber = new Random().Next(0, 2);
         var game = new Game
         {
-            BlackName = players[randomNumber], // todo: have to add some randomisation here
+            BlackName = players[randomNumber],
             WhiteName = players[randomNumber ^ 1],
             Code = gameCode,
             State = GameState.Created

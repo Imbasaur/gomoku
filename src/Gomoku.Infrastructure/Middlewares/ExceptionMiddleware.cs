@@ -27,6 +27,7 @@ public sealed class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionM
         context.Response.StatusCode = exception switch
         {
             GameMoveExistsException => StatusCodes.Status400BadRequest,
+            GameMoveIncorrectStateException => StatusCodes.Status400BadRequest,
 
             _ => StatusCodes.Status400BadRequest
         };

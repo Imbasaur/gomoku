@@ -10,11 +10,11 @@ using System.Text.Json;
 namespace Gomoku.Core.Services;
 public class WaitingListService(IWaitingListRepository repository, IMapper mapper, IHubContext<GameHub> hub, IGameService gameService) : IWaitingListService
 {
-    public async Task Add(string playerName)
+    public async Task Add(string playerName, string connectionId)
     {
-        await repository.AddAsync(new PlayerWaiting(playerName));
+        await repository.AddAsync(new PlayerWaiting(playerName, connectionId));
 
-        await hub.Clients.AllExcept(playerName).SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
+        await hub.Clients.AllExcept(connectionId).SendAsync("PlayerJoinedWaitingList", playerName); // remove later, no need to send this to front
 
         if (await repository.CountAsync() > 1)
             await gameService.Create();
