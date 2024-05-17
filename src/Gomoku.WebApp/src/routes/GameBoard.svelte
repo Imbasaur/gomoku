@@ -243,31 +243,21 @@
     }
 
     .black::after {
-        left: 3px;
-        top: 3px;
-        height: 24px;
-        width: 24px;
-        background-color: black;
+        left: 3px !important;
+        top: 3px  !important;
+        height: 24px  !important;
+        width: 24px !important;
+        background-color: black !important;
         border-radius: 50%;
         display: inline-block;
     }
 
     .white::after {
-        left: 3px;
-        top: 3px;
-        height: 24px;
-        width: 24px;
-        background-color: white;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .test::after {
-        left: 3px;
-        top: 3px;
-        height: 24px;
-        width: 24px;
-        background-color: rgb(255, 0, 0);
+        left: 3px !important;
+        top: 3px !important;
+        height: 24px !important;
+        width: 24px !important;
+        background-color: white !important;
         border-radius: 50%;
         display: inline-block;
     }
