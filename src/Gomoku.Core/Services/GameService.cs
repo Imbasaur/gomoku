@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Gomoku.Core.Dtos.Games;
 using Gomoku.Core.Exceptions;
-using Gomoku.Core.Extensions;
 using Gomoku.Core.Hubs;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Entities;
@@ -106,6 +105,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task AddMove(Guid code, string move)
     {
+        char delimiter = ';';
         // move will be validated already validated
         var game = await repository.GetAsync(x => x.Code  == code);
         ArgumentNullException.ThrowIfNull(game);
@@ -113,16 +113,16 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         if (game.State != GameState.Started)
             throw new GameMoveIncorrectStateException();
 
-        if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains(move, StringComparison.InvariantCultureIgnoreCase))
+        if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{delimiter}", StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
         // todo: add move verification (player, color)  
 
-        game.Moves += move;
+        game.Moves += move + delimiter;
         await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
-        var movesList = game.Moves.SplitMoves().ToList();
-        var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count() - 1) % 2));
+        var movesList = game.Moves.Split(delimiter).ToList();
+        var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
 
         if (isWinningMove)
         {
