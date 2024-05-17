@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameCode, moves, displayBoard } from "$lib/stores";
+	import { gameCode, moves, displayBoard, player } from "$lib/stores";
 
     function handleClick(column:number, row:number){
         addMove(numToAlpha(column) + row);
@@ -13,7 +13,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ code: $gameCode, move})
+            body: JSON.stringify({ code: $gameCode, move, playername: $player})
         })
         .then(response => {
             if (!response.ok) {

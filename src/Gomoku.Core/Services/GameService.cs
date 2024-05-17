@@ -103,7 +103,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         }
     }
 
-    public async Task AddMove(Guid code, string move)
+    public async Task AddMove(Guid code, string move, string playerName)
     {
         char delimiter = ';';
         // move will be validated already validated
@@ -113,15 +113,21 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         if (game.State != GameState.Started)
             throw new GameMoveIncorrectStateException();
 
+        var movesList = string.IsNullOrEmpty(game.Moves)
+            ? []
+            : game.Moves.Split(delimiter).SkipLast(1).ToList();
+
+        if ((movesList.Count % 2 == 1 && playerName.Equals(game.BlackName, StringComparison.InvariantCultureIgnoreCase)) ||
+            (movesList.Count % 2 == 0 && playerName.Equals(game.WhiteName, StringComparison.InvariantCultureIgnoreCase)))
+            throw new GameMoveIncorrectPlayerException();
+
         if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{delimiter}", StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
-        // todo: add move verification (player, color)  
-
         game.Moves += move + delimiter;
+        movesList.Add(move);
         await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
-        var movesList = game.Moves.Split(delimiter).SkipLast(1).ToList();
         var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
 
         if (isWinningMove)

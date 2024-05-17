@@ -37,7 +37,8 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
 
     public async Task<bool> Move(AddMoveRequest request)
     {
-        await gameService.AddMove(request.Code, request.Move);
+        var username = Context.GetHttpContext().Request.Query["username"]; // todo: remove when accounts will be added
+        await gameService.AddMove(request.Code, request.Move, username);
 
         return true;
     }
