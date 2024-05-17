@@ -121,7 +121,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         game.Moves += move + delimiter;
         await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
 
-        var movesList = game.Moves.Split(delimiter).ToList();
+        var movesList = game.Moves.Split(delimiter).SkipLast(1).ToList();
         var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
 
         if (isWinningMove)
