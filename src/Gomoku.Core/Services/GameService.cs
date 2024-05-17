@@ -153,8 +153,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
                 if (count > 1 && count < 5)
                 {
-                    _ = CheckStonesInDirection(x, y, 0 - i, 0 - j, moves); // todo: fix, doesn't work
-                    break;
+                    count += CheckStonesInDirection(x, y, 0 - i, 0 - j, moves);
                 }
 
                 if (count >= 5)
