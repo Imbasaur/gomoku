@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { gameCode, moves, displayBoard, player } from "$lib/stores";
 
-    function handleClick(column:number, row:number){
-        addMove(numToAlpha(column) + row);
-        console.log("Clientside - Node " + numToAlpha(column) + row )
+    function handleClick(e:any, column:number, row:number){
+        if (e.currentTarget.getAttribute('disabled') == null){
+            addMove(numToAlpha(column) + row);
+            console.log("Clientside - Node " + numToAlpha(column) + row )
+        }
     }
     
     function addMove(move: string) {  // this should be signalr call
@@ -39,7 +41,9 @@
     
     function addStone(node: string, index: number){
         console.log('Adding stone on ' + node)
-        document.getElementById("node-" + node)?.classList.add(getColor(index))
+        let element = document.getElementById("node-" + node);
+        element?.classList.add(getColor(index))
+        element?.setAttribute('disabled', '');
     }
 
     $: if ($moves.length > 0)
@@ -52,7 +56,7 @@
     {#each Array.from(Array(15).keys()) as column}
         <div class="{numToAlpha(column+1)}">
             {#each Array.from(Array(15).keys()) as row}
-                <div class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|once={() => handleClick(1+column, 15-row)}></div>
+                <div class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click={(e) => handleClick(e, 1+column, 15-row)}></div>
             {/each}
         </div>
     {/each}
