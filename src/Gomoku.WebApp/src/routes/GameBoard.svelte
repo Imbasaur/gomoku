@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameCode, moves } from "$lib/stores";
+	import { gameCode, moves, displayBoard } from "$lib/stores";
 
     function handleClick(column:number, row:number){
         addMove(numToAlpha(column) + row);
@@ -46,6 +46,8 @@
         addStone($moves[$moves.length - 1], $moves.length)
 
 </script>
+
+{#if $displayBoard == true}
 <div id="board">
     {#each Array.from(Array(15).keys()) as column}
         <div class="{numToAlpha(column+1)}">
@@ -55,6 +57,8 @@
         </div>
     {/each}
 </div>
+{/if}
+
 <style>
     #board {
         margin-left: auto;

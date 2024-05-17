@@ -2,6 +2,7 @@
     import type { PageData } from './$types';
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
+	import { player } from '$lib/stores';
     
     export let data: PageData;
 	const getGames = (async () => {
@@ -30,6 +31,12 @@
 	{:catch error}
 		<p>An error occurred.</p>
 	{/await}
+
+	{#if $player != ''}
+	<div>
+		<p>Player name is {$player}</p>
+	</div>
+	{/if}
 	<GameHub />
 	<GameBoard />
 </div>
