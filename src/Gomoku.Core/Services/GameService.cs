@@ -65,9 +65,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     {
         try
         {
-            await repository.ConnectPlayerAsync(code, playerName);
             await gameHub.Groups.AddToGroupAsync(connectionId, code.ToString());
             await gameHub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
+            await repository.ConnectPlayerAsync(code, playerName);
 
             if (await repository.AreBothPlayersConnectedAsync(code))
             {
