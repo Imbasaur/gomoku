@@ -14,6 +14,12 @@ public sealed class Game : IEntity<int>
     public bool IsWhiteConnected { get; set; }
     public bool IsBlackConnected { get; set; }
     public GameVariant Variant { get; set; }
+    public DateTime? StartTime { get; set; }
+    public decimal Time { get; set; }
+    public decimal BlackTime { get; set; }
+    public DateTime? BlackLastMoveTime { get; set; }
+    public decimal WhiteTime { get; set; }
+    public DateTime? WhiteLastMoveTime { get; set; }
 
     // Concurrency token
     public uint Version { get; set; }

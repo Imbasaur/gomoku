@@ -8,5 +8,6 @@ public enum GameState
     Paused,
     Resumed,
     Finished,
-    FinishedByPlayerTimeout,
+    FinishedByPlayerDisconnect,
+    FinishedByPlayerTimeout
 }

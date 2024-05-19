@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Gomoku.Core.Dtos.Games;
+using Gomoku.Core.Dtos.SignalR;
 using Gomoku.Core.Exceptions;
 using Gomoku.Core.Hubs;
 using Gomoku.Core.Services.Abstract;
@@ -27,7 +28,10 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             BlackName = players[randomNumber].PlayerName,
             WhiteName = players[randomNumber ^ 1].PlayerName,
             Code = gameCode,
-            State = GameState.Created
+            State = GameState.Created,
+            Time = 60,
+            BlackTime = 60,
+            WhiteTime = 60,
         };
 
         await repository.AddAsync(game);
@@ -105,7 +109,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task AddMove(Guid code, string move, string playerName)
     {
-        char delimiter = ';';
+        var delimiter = ';';
+        var moveTime = DateTime.UtcNow; // todo: should be client time? how to handle lags, cheating?
+
         // move will be validated already validated
         var game = await repository.GetAsync(x => x.Code  == code);
         ArgumentNullException.ThrowIfNull(game);
@@ -124,19 +130,63 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{delimiter}", StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
-        game.Moves += move + delimiter;
-        movesList.Add(move);
-        await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", move);
-
-        var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
-
-        if (isWinningMove)
+        // handle timer
+        if (!game.BlackLastMoveTime.HasValue)
         {
-            var blackWon = movesList.IndexOf(move) % 2 == 0;
-            var winnerName = blackWon ? game.BlackName : game.WhiteName;
-            await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
-            game.Winner = winnerName;
-            game.State = GameState.Finished;
+            game.BlackLastMoveTime = moveTime;
+            game.StartTime = moveTime;
+        }
+        else if (playerName.Equals(game.WhiteName, StringComparison.InvariantCultureIgnoreCase))
+        {
+            var timeLeft = TimeSpan.FromSeconds((double)game.WhiteTime) - (moveTime - game.BlackLastMoveTime);
+            game.WhiteTime = (decimal)timeLeft.Value.TotalSeconds;
+            game.WhiteLastMoveTime = moveTime;
+
+            if (timeLeft.Value.TotalSeconds < 0)
+            {
+                game.State = GameState.FinishedByPlayerTimeout;
+                game.Winner = game.BlackName;
+            }
+        }
+        else if (playerName.Equals(game.BlackName, StringComparison.InvariantCultureIgnoreCase))
+        {
+            var timeLeft = TimeSpan.FromSeconds((double)game.BlackTime) - (moveTime - game.WhiteLastMoveTime);
+            game.BlackTime = (decimal)timeLeft.Value.TotalSeconds;
+            game.BlackLastMoveTime = moveTime;
+
+            if (timeLeft.Value.TotalSeconds < 0)
+            {
+                game.State = GameState.FinishedByPlayerTimeout;
+                game.Winner = game.WhiteName;
+            }
+        }
+
+        if (game.State == GameState.FinishedByPlayerTimeout)
+            await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinishedByPlayerTimeout", game.Winner);
+        else
+        {
+            game.Moves += move + delimiter;
+            movesList.Add(move);
+            await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", new MoveAdded
+            {
+                Move = move,
+                Clock = new ClockDto
+                {
+                    Black = game.BlackTime,
+                    White = game.WhiteTime
+                }
+            });
+
+            var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
+
+            if (isWinningMove)
+            {
+                var blackWon = movesList.IndexOf(move) % 2 == 0;
+                var winnerName = blackWon ? game.BlackName : game.WhiteName;
+                await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
+                game.Winner = winnerName;
+                game.State = GameState.Finished;
+            }
         }
 
         await repository.UpdateAsync(game);
@@ -157,7 +207,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
                 var count = 1 + CheckStonesInDirection(x, y, i, j, moves);
 
-                if (count > 1 && count < 5)
+                if (count > 1 && count < 5) // todo: more than 6 is variant
                 {
                     count += CheckStonesInDirection(x, y, 0 - i, 0 - j, moves);
                 }

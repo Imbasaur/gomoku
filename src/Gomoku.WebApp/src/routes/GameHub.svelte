@@ -3,6 +3,7 @@
     import { onDestroy } from 'svelte';
     import { player, gameCode, moves, latestMove, displayBoard } from "$lib/stores";
 	import type { Join } from "$lib/requests/join";
+    import type { MoveAdded } from "$lib/responses/moveAdded";
 
     let playerReady = false;
 
@@ -47,11 +48,11 @@
         console.log('Both players connected.');
     })
 
-    connection.on('MoveAdded', move => {
+    connection.on('MoveAdded', (response: MoveAdded) => {
         // todo: add move to board
-        $latestMove = move;
-        $moves = [...$moves, move];
-        console.log('SignalR - Move added at ' + move + ' by ' + getcolor() + '.');
+        $latestMove = response.move;
+        $moves = [...$moves, response.move];
+        console.log('SignalR - Move added at ' + response.move + ' by ' + getcolor() + '.');
         console.log('SignalR - Moves so far: ' + $moves);
     })
 
@@ -60,6 +61,12 @@
         alert(winner + ' won the game!')
         // todo: disable board, allow to make new game
     })
+
+connection.on('GameFinishedByPlayerTimeout', winner => {
+    console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
+    alert(winner + ' won the game!')
+    // todo: disable board, allow to make new game
+})
 
     function getcolor(){
         if ($moves.length % 2 == 1)
