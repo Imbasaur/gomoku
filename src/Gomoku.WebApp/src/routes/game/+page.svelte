@@ -3,6 +3,7 @@
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
 	import { player } from '$lib/stores';
+	import GamePanel from '../GamePanel.svelte';
     
     export let data: PageData;
 	const getGames = (async () => {
@@ -39,4 +40,5 @@
 	{/if}
 	<GameHub />
 	<GameBoard />
+	<GamePanel />
 </div>

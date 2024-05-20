@@ -1,7 +1,7 @@
 <script lang="ts" >
     import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
     import { onDestroy } from 'svelte';
-    import { player, gameCode, moves, latestMove, displayBoard } from "$lib/stores";
+    import { player, gameCode, moves, latestMove, displayBoard, clock } from "$lib/stores";
 	import type { Join } from "$lib/requests/join";
     import type { MoveAdded } from "$lib/responses/moveAdded";
 
@@ -52,6 +52,8 @@
         // todo: add move to board
         $latestMove = response.move;
         $moves = [...$moves, response.move];
+        $clock = response.clock;
+        console.log('SignalR - Clock:' + $clock);
         console.log('SignalR - Move added at ' + response.move + ' by ' + getcolor() + '.');
         console.log('SignalR - Moves so far: ' + $moves);
     })
