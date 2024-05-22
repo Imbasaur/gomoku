@@ -12,5 +12,7 @@ export const player = readable(name);
 export const gameCode = writable('');
 export const moves = writable([]);
 export const latestMove = writable('');
-export const displayBoard = writable(false);
 export const clock = writable<Clock>();
+
+export const displayBoard = writable(false);
+export const playerReady = writable(false);

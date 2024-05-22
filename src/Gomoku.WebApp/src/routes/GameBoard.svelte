@@ -1,32 +1,12 @@
 <script lang="ts">
-	import { gameCode, moves, displayBoard, player } from "$lib/stores";
+	import { gameCode, moves, displayBoard } from "$lib/stores";
+    import { move } from "$lib/services/game-hub-client";
 
     function handleClick(e:any, column:number, row:number){
         if (e.currentTarget.getAttribute('disabled') == null){
-            addMove(numToAlpha(column) + row);
+            move($gameCode, numToAlpha(column) + row);
             console.log("Clientside - Node " + numToAlpha(column) + row )
         }
-    }
-    
-    function addMove(move: string) {  // this should be signalr call
-        console.log("code is " + $gameCode);
-        fetch("http://localhost:5190/Game/move", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ code: $gameCode, move, playername: $player})
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add a move to the game')
-            }
-            console.log("Successfully added move the game.");
-            // anything else?
-        })
-        .catch(error => {
-            console.error('Error adding move to the game:', error.message);
-        });
     }
 
     function numToAlpha(n: number){
@@ -56,7 +36,7 @@
     {#each Array.from(Array(15).keys()) as column}
         <div class="{numToAlpha(column+1)}">
             {#each Array.from(Array(15).keys()) as row}
-                <div class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click={(e) => handleClick(e, 1+column, 15-row)}></div>
+                <div class="node {numToAlpha(column+1)}{15-row} node-{numToAlpha(column+1)}{15-row} column-{numToAlpha(column+1)} row-{15-row}" id="node-{numToAlpha(column+1)}{15-row}" on:click|preventDefault={(e) => handleClick(e, 1+column, 15-row)}></div>
             {/each}
         </div>
     {/each}
