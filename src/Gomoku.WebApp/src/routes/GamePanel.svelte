@@ -1,14 +1,21 @@
 <script lang="ts">
+    import Clock from "$lib/components/Clock.svelte";
+     
     import { clock, displayBoard } from "$lib/stores";
+
+
 </script>
 
 
 {#if $displayBoard == true}
     <div id="panel">
         <div>
+            {console.log($clock)}
             {#if $clock != null}
-                <p>Black {$clock.black}s left</p>
-                <p>White {$clock.white}s left</p>
+                <p>Black</p>
+                <Clock bind:countdown={$clock.black}/>
+                <p>White</p>
+                <Clock bind:countdown={$clock.white}/>
             {/if}
         </div>
     </div>
