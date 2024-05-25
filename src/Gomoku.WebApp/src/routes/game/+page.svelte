@@ -38,7 +38,21 @@
 		<p>Player name is {$player}</p>
 	</div>
 	{/if}
+
 	<GameHub />
-	<GameBoard />
-	<GamePanel />
+	<div class="game-panel">
+		<GameBoard />
+		<GamePanel />
+	</div>
 </div>
+
+<style>
+	.game-panel {
+		display: flex;
+		max-width: 48rem;
+		flex: 0.6;
+		flex-direction: row;
+		justify-content: center;
+		margin: 0 auto;
+	}
+</style>

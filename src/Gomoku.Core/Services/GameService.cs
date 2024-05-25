@@ -172,8 +172,8 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 Move = move,
                 Clock = new ClockDto
                 {
-                    Black = game.BlackTime,
-                    White = game.WhiteTime
+                    Black = decimal.Round(game.BlackTime, 2),
+                    White = decimal.Round(game.WhiteTime, 2)
                 }
             });
 

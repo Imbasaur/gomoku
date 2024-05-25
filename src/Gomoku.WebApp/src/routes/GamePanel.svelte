@@ -10,12 +10,11 @@
 {#if $displayBoard == true}
     <div id="panel">
         <div>
-            {console.log($clock)}
             {#if $clock != null}
                 <p>Black</p>
-                <Clock bind:countdown={$clock.black}/>
+                <Clock bind:countdown={$clock.black} color = 'black'/>
                 <p>White</p>
-                <Clock bind:countdown={$clock.white}/>
+                <Clock bind:countdown={$clock.white} color = 'white'/>
             {/if}
         </div>
     </div>
@@ -23,8 +22,8 @@
 
 <style>
     #panel {
-        height: 600 px;
-        width: 300px;
+        height: 450px;
+        width: 250px;
         background-color: #e3bc88;
     }
 </style>

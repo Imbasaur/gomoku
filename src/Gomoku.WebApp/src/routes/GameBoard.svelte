@@ -47,8 +47,8 @@
     #board {
         margin-left: auto;
         margin-right: auto;
-        width: 600px;
-        height: 600px;
+        width: 450;
+        height: 450;
         display: grid;
         grid-template-columns: repeat(15, 0fr);
     }

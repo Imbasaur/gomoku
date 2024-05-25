@@ -1,7 +1,7 @@
 
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { onDestroy } from 'svelte';
-import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady } from "$lib/stores";
+import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 import type { Move } from "$lib/requests/move";
@@ -57,6 +57,8 @@ connection.on('MoveAdded', (response: MoveAdded) => {
     latestMove.set(response.move)
     moves.update(items => ([...items, response.move])) // works?
     clock.set(response.clock)
+    console.log('new active color is ' +getActivePlayer())
+    activePlayer.set(getActivePlayer());
     console.log('SignalR - Clock:' + response.clock);
     console.log('SignalR - Move added at ' + response.move + ' by ' + getcolor() + '.');
     console.log('SignalR - Moves so far: ' + movesSub);
@@ -76,6 +78,12 @@ alert(winner + ' won the game!')
 
 function getcolor(){
     if (movesSub.length % 2 == 1)
+        return "black"
+    return "white"
+}
+
+function getActivePlayer(){
+    if (movesSub.length % 2 == 0)
         return "black"
     return "white"
 }

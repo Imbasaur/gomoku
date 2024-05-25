@@ -7,11 +7,12 @@ const name: string = uniqueNamesGenerator({
   }); 
   
 
-export const player = readable(name);
+export const player = readable<string>(name);
 
-export const gameCode = writable('');
-export const moves = writable([]);
-export const latestMove = writable('');
+export const gameCode = writable<string>('');
+export const moves = writable<string[]>([]);
+export const latestMove = writable<string>('');
+export const activePlayer = writable<string>('');
 export const clock = writable<Clock>();
 
 export const displayBoard = writable(false);
