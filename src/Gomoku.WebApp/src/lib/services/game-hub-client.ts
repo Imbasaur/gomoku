@@ -57,9 +57,8 @@ connection.on('MoveAdded', (response: MoveAdded) => {
     latestMove.set(response.move)
     moves.update(items => ([...items, response.move])) // works?
     clock.set(response.clock)
-    console.log('new active color is ' +getActivePlayer())
     activePlayer.set(getActivePlayer());
-    console.log('SignalR - Clock:' + response.clock);
+    console.log('SignalR - Clock:' + JSON.stringify(response.clock));
     console.log('SignalR - Move added at ' + response.move + ' by ' + getcolor() + '.');
     console.log('SignalR - Moves so far: ' + movesSub);
 })

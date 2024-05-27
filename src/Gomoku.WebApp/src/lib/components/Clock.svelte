@@ -1,10 +1,7 @@
 <script>
-	import { activePlayer } from "$lib/stores";
+	import { activePlayer, clock } from "$lib/stores";
 	import { onDestroy } from "svelte";
 
-
-
-    export let countdown
     export let color
     
     function fromatMs(ms) {
@@ -13,22 +10,28 @@
         return formattedSeconds;
     }
 
-    let ms = 100
+    let countdown =  (color == 'black' ? $clock.black : $clock.white)
+    let ms = 1000
     let now = Date.now();
     let end = now + countdown * 1000
+    $: {
+        countdown = (color == 'black' ? $clock.black : $clock.white)
+        //end = now + countdown * 1000
+    }
 
     const updateTimer = () => {
         if (color == $activePlayer){
             let val = fromatMs(end-now)
-            now = Date.now();
-            // let val = Math.round((countdown - (ms/1000)) * 100) / 100
+            console.log('color: ' + color + ', countdown: ' + countdown + ', newTimeLeft: ' + val)
+            //now = Date.now();
             if (val > 0){
                 countdown = val
-                return
+            }
+            else {
+                countdown = 0
+                // call backend
             }
 
-            countdown = 0
-            // call backend
         }
     }
 

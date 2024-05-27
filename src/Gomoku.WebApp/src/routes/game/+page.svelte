@@ -19,7 +19,7 @@
 <div class="text-column">
 
 	<!-- svelte-ignore empty-block -->
-	{#await getGames}
+	<!-- {#await getGames}
 	{:then games}
 	{#if games.length != 0}
 		<p>Games</p>
@@ -31,7 +31,7 @@
 	{/if}
 	{:catch error}
 		<p>An error occurred.</p>
-	{/await}
+	{/await} -->
 
 	{#if $player != ''}
 	<div>
