@@ -8,9 +8,9 @@
     <div id="panel">
         <div>
             {#if $clock != null}
-                <p>Black {$clock.black}</p>
+                <p>Black</p>
                 <Clock color = 'black'/>
-                <p>White {$clock.white}</p>
+                <p>White</p>
                 <Clock color = 'white'/>
             {/if}
         </div>

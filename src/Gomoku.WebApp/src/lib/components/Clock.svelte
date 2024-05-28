@@ -1,54 +1,91 @@
 <script>
-	import { activePlayer, clock } from "$lib/stores";
-	import { onDestroy } from "svelte";
+    import { activePlayer, clock } from "$lib/stores";
+    import { onDestroy, tick } from "svelte";
+    import { get } from 'svelte/store';
+    import { fade } from 'svelte/transition';
 
-    export let color
-    
-    function fromatMs(ms) {
+    export let color;
+
+    function formatMs(ms) {
         let seconds = ms / 1000;
         let formattedSeconds = seconds.toFixed(2);
         return formattedSeconds;
     }
 
-    let countdown =  (color == 'black' ? $clock.black : $clock.white)
-    let ms = 1000
+    let ms = 10;
+    let countdown = color === 'black' ? get(clock).black : get(clock).white;
     let now = Date.now();
-    let end = now + countdown * 1000
-    $: {
-        countdown = (color == 'black' ? $clock.black : $clock.white)
-        //end = now + countdown * 1000
-    }
+    let end = now + countdown * 1000;
+    let difference = null;
+    let showDifference = false;
+    let differenceColor = '';
+    let differenceSymbol = '';
+
+    const unsubscribe = clock.subscribe(async ($clock) => {
+        let newCountdown = color === 'black' ? $clock.black : $clock.white;
+        let otherCountdown = color === 'black' ? $clock.white : $clock.black;
+        let newCountdownMs = newCountdown * 1000;
+        let oldCountdownMs = countdown * 1000;
+        let diffMs = Math.abs(newCountdownMs - oldCountdownMs);
+
+        let shouldShowDifference = !(newCountdown === 60 && otherCountdown === 60) && diffMs !== 0;
+
+        if (shouldShowDifference) {
+            if (newCountdownMs < oldCountdownMs) {
+                differenceColor = 'red';
+                differenceSymbol = '-';
+            } else {
+                differenceColor = 'green';
+                differenceSymbol = '+';
+            }
+
+            difference = differenceSymbol + formatMs(diffMs);
+            showDifference = true;
+
+            await tick();
+
+            setTimeout(() => {
+                showDifference = false;
+            }, 100); 
+        }
+
+        countdown = newCountdown;
+        now = Date.now();
+        end = now + countdown * 1000;
+    });
 
     const updateTimer = () => {
-        if (color == $activePlayer){
-            let val = fromatMs(end-now)
-            console.log('color: ' + color + ', countdown: ' + countdown + ', newTimeLeft: ' + val)
-            //now = Date.now();
-            if (val > 0){
-                countdown = val
+        if (color === get(activePlayer)) {
+            now = Date.now();
+            let remainingTime = end - now;
+            if (remainingTime > 0) {
+                countdown = formatMs(remainingTime);
+                console.log(`color: ${color}, countdown: ${countdown}, remainingTime: ${remainingTime}, diffMs: ${difference}`);
+            } else {
+                countdown = '0.00';
+                // Call backend
+                clearInterval(interval);
             }
-            else {
-                countdown = 0
-                // call backend
-            }
-
         }
-    }
+    };
 
-    let interval = setInterval(updateTimer, ms)
-    $: if (countdown == 0)
-        clearInterval(interval)
+    let interval = setInterval(updateTimer, ms);
 
     onDestroy(() => {
         clearInterval(interval);
+        unsubscribe();
     });
 </script>
 
 <p>
     {countdown}
+    {#if showDifference}
+        <span class="difference" style="color: {differenceColor}" out:fade={{ delay: 1000, duration: 2000 }}>{difference}</span>
+    {/if}
 </p>
 
-
 <style>
-
+    .difference {
+        transition: opacity 1s ease-out;
+    }
 </style>
