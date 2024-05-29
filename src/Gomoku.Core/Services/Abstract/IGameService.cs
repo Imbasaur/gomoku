@@ -9,4 +9,5 @@ public interface IGameService
     Task<GameDto> Get(Guid gameCode);
     Task Join(Guid code, string playerName, string connectionId = null);
     Task AddMove(Guid code, string move, string playerName);
+    Task CheckTimeoutWin(Guid gameCode);
 }

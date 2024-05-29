@@ -9,10 +9,14 @@ using Gomoku.DAL.Enums;
 using Gomoku.DAL.Repository;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Gomoku.Core.Services;
-public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> gameHub) : IGameService
+public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> gameHub,
+    GameTimeoutManager gameTimeoutManager, IServiceScopeFactory resolver) : IGameService
 {
+    private readonly char _movesDelimiter = ';';
+
     public async Task<GameCreatedDto> Create()
     {
         var players = await waitingListRepository.GetTop2Async();
@@ -23,15 +27,16 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var gameCode = Guid.NewGuid();
 
         var randomNumber = new Random().Next(0, 2);
+        var gameTime = 10; // todo: should be configurable later
         var game = new Game
         {
             BlackName = players[randomNumber].PlayerName,
             WhiteName = players[randomNumber ^ 1].PlayerName,
             Code = gameCode,
             State = GameState.Created,
-            Time = 60,
-            BlackTime = 60,
-            WhiteTime = 60,
+            Time = gameTime,
+            BlackTime = gameTime,
+            WhiteTime = gameTime,
         };
 
         await repository.AddAsync(game);
@@ -109,11 +114,10 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
     public async Task AddMove(Guid code, string move, string playerName)
     {
-        var delimiter = ';';
         var moveTime = DateTime.UtcNow; // todo: should be client time? how to handle lags, cheating?
 
         // move will be validated already validated
-        var game = await repository.GetAsync(x => x.Code  == code);
+        var game = await repository.GetAsync(x => x.Code == code);
         ArgumentNullException.ThrowIfNull(game);
 
         if (game.State != GameState.Started)
@@ -121,13 +125,14 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
         var movesList = string.IsNullOrEmpty(game.Moves)
             ? []
-            : game.Moves.Split(delimiter).SkipLast(1).ToList();
+            : game.Moves.Split(_movesDelimiter).SkipLast(1).ToList();
+        var activePlayer = (PlayerColor)(movesList.Count % 2);
 
         if ((movesList.Count % 2 == 1 && playerName.Equals(game.BlackName, StringComparison.InvariantCultureIgnoreCase)) ||
             (movesList.Count % 2 == 0 && playerName.Equals(game.WhiteName, StringComparison.InvariantCultureIgnoreCase)))
             throw new GameMoveIncorrectPlayerException();
 
-        if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{delimiter}", StringComparison.InvariantCultureIgnoreCase))
+        if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{_movesDelimiter}", StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
 
         // handle timer
@@ -136,36 +141,14 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             game.BlackLastMoveTime = moveTime;
             game.StartTime = moveTime;
         }
-        else if (playerName.Equals(game.WhiteName, StringComparison.InvariantCultureIgnoreCase))
-        {
-            var timeLeft = TimeSpan.FromSeconds((double)game.WhiteTime) - (moveTime - game.BlackLastMoveTime);
-            game.WhiteTime = (decimal)timeLeft.Value.TotalSeconds;
-            game.WhiteLastMoveTime = moveTime;
-
-            if (timeLeft.Value.TotalSeconds < 0)
-            {
-                game.State = GameState.FinishedByPlayerTimeout;
-                game.Winner = game.BlackName;
-            }
-        }
-        else if (playerName.Equals(game.BlackName, StringComparison.InvariantCultureIgnoreCase))
-        {
-            var timeLeft = TimeSpan.FromSeconds((double)game.BlackTime) - (moveTime - game.WhiteLastMoveTime);
-            game.BlackTime = (decimal)timeLeft.Value.TotalSeconds;
-            game.BlackLastMoveTime = moveTime;
-
-            if (timeLeft.Value.TotalSeconds < 0)
-            {
-                game.State = GameState.FinishedByPlayerTimeout;
-                game.Winner = game.WhiteName;
-            }
-        }
+        else
+            CheckTimeoutWinCondition(activePlayer, moveTime, game);
 
         if (game.State == GameState.FinishedByPlayerTimeout)
             await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinishedByPlayerTimeout", game.Winner);
         else
         {
-            game.Moves += move + delimiter;
+            game.Moves += move + _movesDelimiter;
             movesList.Add(move);
             await gameHub.Clients.Group(code.ToString()).SendAsync("MoveAdded", new MoveAdded
             {
@@ -187,9 +170,74 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 game.Winner = winnerName;
                 game.State = GameState.Finished;
             }
+            else
+                gameTimeoutManager.ScheduleGameCheck(code, activePlayer == PlayerColor.Black ? game.WhiteTime : game.BlackTime, GetCheckTimeoutFunc());
+
         }
 
         await repository.UpdateAsync(game);
+    }
+
+    public async Task CheckTimeoutWin(Guid gameCode)
+    {
+        var currentTime = DateTime.UtcNow;
+        var game = await repository.GetAsync(x => x.Code == gameCode);
+        ArgumentNullException.ThrowIfNull(game);
+
+        var movesList = string.IsNullOrEmpty(game.Moves)
+            ? []
+            : game.Moves.Split(_movesDelimiter).SkipLast(1).ToList();
+        var activePlayer = (PlayerColor)(movesList.Count % 2);
+
+        if (CheckTimeoutWinCondition(activePlayer, currentTime, game))
+        {
+            await gameHub.Clients.Group(gameCode.ToString()).SendAsync("GameFinishedByPlayerTimeout", game.Winner);
+            await repository.UpdateAsync(game);
+        }
+    }
+
+    public Func<Guid, Task> GetCheckTimeoutFunc()
+    {
+        return async (gameId) =>
+        {
+            using var scope = resolver.CreateAsyncScope();
+            var scopedGameService = scope.ServiceProvider.GetRequiredService<IGameService>();
+            await scopedGameService.CheckTimeoutWin(gameId);
+        };
+    }
+
+    private static bool CheckTimeoutWinCondition(PlayerColor activePlayer, DateTime actionTime, Game game)
+    {
+        if (activePlayer == PlayerColor.White)
+        {
+            var timeLeft = TimeSpan.FromSeconds((double)game.WhiteTime) - (actionTime - game.BlackLastMoveTime);
+            game.WhiteTime = (decimal)timeLeft.Value.TotalSeconds;
+            game.WhiteLastMoveTime = actionTime;
+
+            if (timeLeft.Value.TotalSeconds < 0)
+            {
+                game.State = GameState.FinishedByPlayerTimeout;
+                game.Winner = game.BlackName;
+
+                return true;
+            }
+        }
+        else
+        {
+            var timeLeft = TimeSpan.FromSeconds((double)game.BlackTime) - (actionTime - game.WhiteLastMoveTime);
+            game.BlackTime = (decimal)timeLeft.Value.TotalSeconds;
+            game.BlackLastMoveTime = actionTime;
+
+            if (timeLeft.Value.TotalSeconds < 0)
+            {
+                game.State = GameState.FinishedByPlayerTimeout;
+                game.Winner = game.WhiteName;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // todo: find better way to check wining move, this is extremly ugly

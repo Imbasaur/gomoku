@@ -1,4 +1,5 @@
 ﻿using Gomoku.Core.Profiles;
+using Gomoku.Core.Services;
 using Gomoku.Core.Services.Abstract;
 using Gomoku.DAL.Repository;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,8 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddSingleton<GameTimeoutManager>();
+
         services.AddScoped<IGameRepository, GameRepository>();
         services.AddScoped<IWaitingListRepository, WaitingListRepository>();
 
