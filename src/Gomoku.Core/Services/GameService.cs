@@ -126,7 +126,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var movesList = string.IsNullOrEmpty(game.Moves)
             ? []
             : game.Moves.Split(_movesDelimiter).SkipLast(1).ToList();
-        var activePlayer = (PlayerColor)(movesList.Count % 2);
 
         if ((movesList.Count % 2 == 1 && playerName.Equals(game.BlackName, StringComparison.InvariantCultureIgnoreCase)) ||
             (movesList.Count % 2 == 0 && playerName.Equals(game.WhiteName, StringComparison.InvariantCultureIgnoreCase)))
@@ -136,6 +135,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             throw new GameMoveExistsException();
 
         // handle timer
+        var activePlayer = (PlayerColor)(movesList.Count % 2);
         if (!game.BlackLastMoveTime.HasValue)
         {
             game.BlackLastMoveTime = moveTime;
@@ -169,9 +169,10 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
                 game.Winner = winnerName;
                 game.State = GameState.Finished;
+                gameTimeoutManager.StopTracking(code);
             }
             else
-                gameTimeoutManager.ScheduleGameCheck(code, activePlayer == PlayerColor.Black ? game.WhiteTime : game.BlackTime, GetCheckTimeoutFunc());
+                gameTimeoutManager.TrackGameTimeout(code, activePlayer == PlayerColor.Black ? game.WhiteTime : game.BlackTime, GetCheckTimeoutFunc());
 
         }
 

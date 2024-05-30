@@ -5,7 +5,7 @@ public class GameTimeoutManager
 {
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _games = new();
 
-    public void ScheduleGameCheck(Guid gameId, decimal timeLeft, Func<Guid, Task> onTimeoutAction)
+    public void TrackGameTimeout(Guid gameId, decimal timeLeft, Func<Guid, Task> onTimeoutAction)
     {
         if (_games.TryGetValue(gameId, out var existingCts))
         {
@@ -17,6 +17,15 @@ public class GameTimeoutManager
         _games[gameId] = cts;
 
         _ = GameCheckTask(gameId, timeLeft, onTimeoutAction, cts.Token);
+    }
+
+    public void StopTracking(Guid gameId)
+    {
+        if (_games.TryGetValue(gameId, out var cts))
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
     }
 
     private async Task GameCheckTask(Guid gameId, decimal timeLeft, Func<Guid, Task> onTimeoutAction, CancellationToken cancellationToken)

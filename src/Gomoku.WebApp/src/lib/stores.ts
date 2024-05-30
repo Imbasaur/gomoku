@@ -15,5 +15,6 @@ export const latestMove = writable<string>('');
 export const activePlayer = writable<string>('');
 export const clock = writable<Clock>();
 
-export const displayBoard = writable(false);
-export const playerReady = writable(false);
+export const displayBoard = writable<boolean>(false);
+export const playerReady = writable<boolean>(false);
+export const gameFinished = writable<boolean>(false);

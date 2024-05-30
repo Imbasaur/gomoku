@@ -10,6 +10,6 @@
     {#if $playerReady}
         Cancel
     {:else}
-        Start
+        Find game
     {/if}
 </button>

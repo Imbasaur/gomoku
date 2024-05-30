@@ -1,5 +1,5 @@
 <script>
-    import { activePlayer, clock } from "$lib/stores";
+    import { activePlayer, clock, gameFinished } from "$lib/stores";
     import { onDestroy, tick } from "svelte";
     import { get } from 'svelte/store';
     import { fade } from 'svelte/transition';
@@ -21,7 +21,7 @@
     let differenceColor = '';
     let differenceSymbol = '';
 
-    const unsubscribe = clock.subscribe(async ($clock) => {
+    const unsubscribeClock = clock.subscribe(async ($clock) => {
         let newCountdown = color === 'black' ? $clock.black : $clock.white;
         let otherCountdown = color === 'black' ? $clock.white : $clock.black;
         let newCountdownMs = newCountdown * 1000;
@@ -54,6 +54,11 @@
         end = now + countdown * 1000;
     });
 
+    const unsubscribeGameFinished  = gameFinished.subscribe(($gameFinished) => {
+        if ($gameFinished)
+            clearInterval(interval)
+    })
+
     const updateTimer = () => {
         if (color === get(activePlayer)) {
             now = Date.now();
@@ -73,7 +78,8 @@
 
     onDestroy(() => {
         clearInterval(interval);
-        unsubscribe();
+        unsubscribeClock();
+        unsubscribeGameFinished();
     });
 </script>
 

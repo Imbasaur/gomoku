@@ -1,16 +1,13 @@
 
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-import { onDestroy } from 'svelte';
-import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer } from "$lib/stores";
+import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
-import type { Move } from "$lib/requests/move";
 
 // store values
-let playerSub: string = "", movesSub: string[], latestMoveSub: string;
+let playerSub: string = "", movesSub: string[]
 
 player.subscribe((value) => (playerSub = value));
-latestMove.subscribe((value) => (latestMoveSub = value));
 moves.subscribe((value) => (movesSub = value));
 
 const connection = new HubConnectionBuilder()
@@ -64,15 +61,17 @@ connection.on('MoveAdded', (response: MoveAdded) => {
 })
 
 connection.on('GameFinished', winner => {
+    gameFinished.set(true);
     console.log('SignalR - Game finished and the winner is  ' + winner);
     alert(winner + ' won the game!')
     // todo: disable board, allow to make new game
 })
 
 connection.on('GameFinishedByPlayerTimeout', winner => {
-console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
-alert(winner + ' won the game!')
-// todo: disable board, allow to make new game
+    gameFinished.set(true);
+    console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
+    alert(winner + ' won the game!')
+    // todo: disable board, allow to make new game
 })
 
 function getcolor(){
@@ -92,7 +91,12 @@ function getActivePlayer(){
 //     await connection.stop();
 // });
 
-export function move(code:string, move:string){
-    const request: Move = {code: code, move: move};
-    connection.invoke("Move", request);
+export async function move(code:string, move:string){
+    try {
+        const request = { code: code, move: move };
+        await connection.invoke("Move", request);
+    } catch (error) {
+        // Handle the error here
+        console.error("An unexpected error occurred:", error);
+    }
 }
