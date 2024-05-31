@@ -68,7 +68,7 @@
                 console.log(`color: ${color}, countdown: ${countdown}, remainingTime: ${remainingTime}, diffMs: ${difference}`);
             } else {
                 countdown = '0.00';
-                // Call backend
+                // todo: Call backend? maybe not needed with backend timer
                 clearInterval(interval);
             }
         }

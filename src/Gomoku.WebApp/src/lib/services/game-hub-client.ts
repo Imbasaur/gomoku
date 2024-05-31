@@ -50,9 +50,8 @@ connection.on('PlayersConnected', () => {
 })
 
 connection.on('MoveAdded', (response: MoveAdded) => {
-    // todo: add move to board
     latestMove.set(response.move)
-    moves.update(items => ([...items, response.move])) // works?
+    moves.update(items => ([...items, response.move]))
     clock.set(response.clock)
     activePlayer.set(getActivePlayer());
     console.log('SignalR - Clock:' + JSON.stringify(response.clock));
@@ -96,7 +95,6 @@ export async function move(code:string, move:string){
         const request = { code: code, move: move };
         await connection.invoke("Move", request);
     } catch (error) {
-        // Handle the error here
         console.error("An unexpected error occurred:", error);
     }
 }

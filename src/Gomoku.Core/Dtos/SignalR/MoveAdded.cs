@@ -5,5 +5,4 @@ public class MoveAdded
 {
     public string Move { get; set; }
     public ClockDto Clock { get; set; }
-
 }
