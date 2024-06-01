@@ -4,12 +4,25 @@
 	import GameBoard from '../GameBoard.svelte';
 	import { player } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
+	import { onMount } from 'svelte';
+	import type { Game } from '$lib/types/Game';
     
     export let data: PageData;
-	const getGames = (async () => {
-		const response = await fetch('http://localhost:5190/Game')
-		return await response.json();
-	})()
+	let gamesList: Game[]
+
+	function getGames(): Promise<Game[]> {
+		return fetch('http://localhost:5190/Game')
+			.then(response => response.json())
+			.then( response => {
+				return response as Game[]
+			})
+	}
+
+	onMount(() => {
+		getGames()
+			.then(games => gamesList = games)
+	})
+
 </script>
 
 <svelte:head>
@@ -19,19 +32,14 @@
 <div class="text-column">
 
 	<!-- svelte-ignore empty-block -->
-	<!-- {#await getGames}
-	{:then games}
-	{#if games.length != 0}
+	{#if gamesList != undefined && gamesList.length != 0}
 		<p>Games</p>
 		<ul>
-			{#each games as game}
-				<li>Code: {game.code}, Black Name: {game.blackName}, White Name: {game.whiteName}</li>
+			{#each gamesList as game}
+				<li>Code: {game.Code}, Black Name: {game.BlackName}, White Name: {game.WhiteName}</li>
 			{/each}
 		</ul>
 	{/if}
-	{:catch error}
-		<p>An error occurred.</p>
-	{/await} -->
 
 	{#if $player != ''}
 	<div>
