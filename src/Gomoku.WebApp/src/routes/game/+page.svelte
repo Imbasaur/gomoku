@@ -31,15 +31,14 @@
 </svelte:head>
 <div class="text-column">
 
-	<!-- svelte-ignore empty-block -->
-	{#if gamesList != undefined && gamesList.length != 0}
+	<!-- {#if gamesList != undefined && gamesList.length != 0}
 		<p>Games</p>
 		<ul>
 			{#each gamesList as game}
-				<li>Code: {game.Code}, Black Name: {game.BlackName}, White Name: {game.WhiteName}</li>
+				<li>Code: {game.code}, Black Name: {game.blackName}, White Name: {game.whiteName}</li>
 			{/each}
 		</ul>
-	{/if}
+	{/if} -->
 
 	{#if $player != ''}
 	<div>

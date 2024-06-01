@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameCode, moves, displayBoard } from "$lib/stores";
+	import { gameCode, moves, displayBoard, latestMove } from "$lib/stores";
     import { move } from "$lib/services/game-hub-client";
 
     function handleClick(e:any, column:number, row:number){
@@ -22,13 +22,15 @@
     function addStone(node: string, index: number){
         console.log('Adding stone on ' + node)
         let element = document.getElementById("node-" + node);
-        element?.classList.add(getColor(index))
+        let oldLatest = document.getElementsByClassName("latest")[0];
+        oldLatest?.classList.remove("latest");
+        element?.classList.add(getColor(index), "latest")
         element?.setAttribute('disabled', '');
     }
 
     $: if ($moves.length > 0)
         addStone($moves[$moves.length - 1], $moves.length)
-
+    
 </script>
 
 {#if $displayBoard == true}
@@ -244,5 +246,15 @@
         background-color: white !important;
         border-radius: 50%;
         display: inline-block;
+    }
+
+    .latest::after {
+        left: 2px !important;
+        top: 2px !important;
+        width: 24px;
+        height: 24px;
+        border: 2px solid red;
+        border-radius: 50%;
+        background-color: transparent;
     }
 </style>

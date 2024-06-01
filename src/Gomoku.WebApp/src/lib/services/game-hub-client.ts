@@ -5,10 +5,11 @@ import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 
 // store values
-let playerSub: string = "", movesSub: string[]
+let playerSub: string = "", movesSub: string[], gameFinishedSub: boolean
 
 player.subscribe((value) => (playerSub = value));
 moves.subscribe((value) => (movesSub = value));
+gameFinished.subscribe((value) => (gameFinishedSub = value));
 
 const connection = new HubConnectionBuilder()
     .withUrl("http://localhost:5190/gameHub?username=" + playerSub) // todo check if name is being sent
@@ -60,16 +61,20 @@ connection.on('MoveAdded', (response: MoveAdded) => {
 })
 
 connection.on('GameFinished', winner => {
-    gameFinished.set(true);
-    console.log('SignalR - Game finished and the winner is  ' + winner);
-    alert(winner + ' won the game!')
+    if (!gameFinishedSub){
+        console.log('SignalR - Game finished and the winner is  ' + winner);
+        alert(winner + ' won the game!')
+        gameFinished.set(true);
+    }
     // todo: disable board, allow to make new game
 })
 
 connection.on('GameFinishedByPlayerTimeout', winner => {
-    gameFinished.set(true);
-    console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
-    alert(winner + ' won the game!')
+    if (!gameFinishedSub){
+        console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
+        alert(winner + ' won the game!')
+        gameFinished.set(true);
+    }
     // todo: disable board, allow to make new game
 })
 
