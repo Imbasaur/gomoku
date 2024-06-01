@@ -22,7 +22,6 @@
 		getGames()
 			.then(games => gamesList = games)
 	})
-
 </script>
 
 <svelte:head>

@@ -1,8 +1,9 @@
 
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished } from "$lib/stores";
+import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
+import type { GameFinished } from "$lib/responses/gameFinished";
 
 // store values
 let playerSub: string = "", movesSub: string[], gameFinishedSub: boolean
@@ -60,10 +61,11 @@ connection.on('MoveAdded', (response: MoveAdded) => {
     console.log('SignalR - Moves so far: ' + movesSub);
 })
 
-connection.on('GameFinished', winner => {
+connection.on('GameFinished', (response: GameFinished) => {
     if (!gameFinishedSub){
-        console.log('SignalR - Game finished and the winner is  ' + winner);
-        alert(winner + ' won the game!')
+        winningStones.set(response.winningStones)
+        console.log('SignalR - Game finished and the winner is  ' + response.winner)
+        alert(response.winner + ' won the game!')
         gameFinished.set(true);
     }
     // todo: disable board, allow to make new game

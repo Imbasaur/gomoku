@@ -160,20 +160,23 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 }
             });
 
-            var isWinningMove = IsWinningMove(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
+            var winningStones = GetWinningStones(move, movesList.Where((v, i) => i % 2 == (movesList.Count - 1) % 2));
 
-            if (isWinningMove)
+            if (!string.IsNullOrEmpty(winningStones))
             {
                 var blackWon = movesList.IndexOf(move) % 2 == 0;
                 var winnerName = blackWon ? game.BlackName : game.WhiteName;
-                await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", winnerName);
+                gameTimeoutManager.StopTracking(code);
+                await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", new GameFinished
+                {
+                    Winner = winnerName,
+                    WinningStones = [.. winningStones.Split(';')]
+                });
                 game.Winner = winnerName;
                 game.State = GameState.Finished;
-                gameTimeoutManager.StopTracking(code);
             }
             else
                 gameTimeoutManager.TrackGameTimeout(code, activePlayer == PlayerColor.Black ? game.WhiteTime : game.BlackTime, GetCheckTimeoutFunc());
-
         }
 
         await repository.UpdateAsync(game);
@@ -242,7 +245,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     }
 
     // todo: find better way to check wining move, this is extremly ugly
-    private static bool IsWinningMove(string move, IEnumerable<string> moves)
+    private static string GetWinningStones(string move, IEnumerable<string> moves)
     {
         var x = move[0];
         var y = int.Parse(move[1..]);
@@ -254,19 +257,20 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 if (i == 0 && j == 0)
                     continue;
 
-                var count = 1 + CheckStonesInDirection(x, y, i, j, moves);
+                var winningStones = GetWinningStonesInDriection(x, y, i, j, moves);
 
-                if (count > 1 && count < 5) // todo: more than 6 is variant
+                if (!string.IsNullOrEmpty(winningStones) && winningStones.Split(";").Length < 5) // todo: more than 6 is variant
                 {
-                    count += CheckStonesInDirection(x, y, 0 - i, 0 - j, moves);
+                    winningStones += GetWinningStonesInDriection(x, y, 0 - i, 0 - j, moves);
                 }
+                winningStones += move;
 
-                if (count >= 5)
-                    return true;
+                if (winningStones.Split(";").Length >= 5)
+                    return winningStones.TrimEnd(';');
             }
         }
 
-        return false;
+        return string.Empty;
     }
 
     private static int CheckStonesInDirection(char posX, int posY, int x, int y, IEnumerable<string> moves)
@@ -277,5 +281,15 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             count = 1 + CheckStonesInDirection((char)(posX + x), posY + y, x, y, moves);
 
         return count;
+    }
+
+    private static string GetWinningStonesInDriection(char posX, int posY, int x, int y, IEnumerable<string> moves)
+    {
+        var winningStones = string.Empty;
+        var moveToCheck = $"{(char)(posX + x)}{posY + y}";
+        if ((posX + x) >= 'a' && (posX + x) <= 'o' && (posY + y) >= 1 && (posY + y) <= 15 && moves.Contains(moveToCheck))
+            winningStones = moveToCheck + ";" + GetWinningStonesInDriection((char)(posX + x), posY + y, x, y, moves);
+
+        return winningStones;
     }
 }

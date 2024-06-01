@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameCode, moves, displayBoard, latestMove } from "$lib/stores";
+	import { gameCode, moves, displayBoard, latestMove, winningStones } from "$lib/stores";
     import { move } from "$lib/services/game-hub-client";
 
     function handleClick(e:any, column:number, row:number){
@@ -22,15 +22,25 @@
     function addStone(node: string, index: number){
         console.log('Adding stone on ' + node)
         let element = document.getElementById("node-" + node);
-        let oldLatest = document.getElementsByClassName("latest")[0];
-        oldLatest?.classList.remove("latest");
-        element?.classList.add(getColor(index), "latest")
+        let oldLatest = document.getElementsByClassName("border")[0];
+        oldLatest?.classList.remove("border");
+        element?.classList.add(getColor(index), "border")
         element?.setAttribute('disabled', '');
     }
 
     $: if ($moves.length > 0)
         addStone($moves[$moves.length - 1], $moves.length)
+
+        winningStones.subscribe((value) => {
+            if (value.length > 0){
+                value.forEach((node) => {
+                    let element = document.getElementById("node-" + node)
+                    element?.classList.add("border")
+                })
+            }
+        })
     
+    // todo: iterate winning moves and add .winning class
 </script>
 
 {#if $displayBoard == true}
@@ -248,11 +258,11 @@
         display: inline-block;
     }
 
-    .latest::after {
-        left: 2px !important;
-        top: 2px !important;
-        width: 24px;
-        height: 24px;
+    .border::after {
+        left: 2px;
+        top: 2px;
+        width: 22px;
+        height: 22px;
         border: 2px solid red;
         border-radius: 50%;
         background-color: transparent;
