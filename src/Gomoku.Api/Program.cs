@@ -2,7 +2,10 @@ using Gomoku.Core.Hubs;
 using Gomoku.DAL;
 using Gomoku.Infrastructure.Configuration;
 using Gomoku.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,18 @@ builder.Services.AddSignalR()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "gomokuApi", // todo: set later
+            ValidAudience = "gomokuFront", // todo: set later
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JWTKEY")), // todo: set later
+        };
+    });
 
 builder.Services.AddCors(options =>
 {

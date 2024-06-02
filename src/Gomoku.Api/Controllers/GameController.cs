@@ -1,9 +1,11 @@
 ﻿using Gomoku.Core.Requests;
 using Gomoku.Core.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class GameController(IGameService gameService) : ControllerBase
 {
@@ -15,6 +17,7 @@ public class GameController(IGameService gameService) : ControllerBase
         return Ok(game);
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetGames()
     {

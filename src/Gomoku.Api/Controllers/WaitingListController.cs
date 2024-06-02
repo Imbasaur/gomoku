@@ -1,9 +1,11 @@
 ﻿using Gomoku.Core.Requests;
 using Gomoku.Core.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gomoku.Api.Controllers;
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class WaitingListController(IWaitingListService waitingListService) : ControllerBase
 {
