@@ -5,6 +5,7 @@ import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 import type { GameFinished } from "$lib/responses/gameFinished";
 import type { Game } from "$lib/types/Game";
+import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
 
 // store values
 let playerSub: string = "", movesSub: string[], gameFinishedSub: boolean
@@ -14,7 +15,7 @@ moves.subscribe((value) => (movesSub = value));
 gameFinished.subscribe((value) => (gameFinishedSub = value));
 
 const connection = new HubConnectionBuilder()
-    .withUrl("http://localhost:5190/gameHub?username=" + playerSub) // todo check if name is being sent
+    .withUrl(PUBLIC_BACKEND_ADDRESS + "/gameHub?username=" + playerSub) // todo check if name is being sent
     .configureLogging(LogLevel.Debug)
     .withAutomaticReconnect()
     .build();

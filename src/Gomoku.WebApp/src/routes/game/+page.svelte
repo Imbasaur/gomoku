@@ -6,16 +6,17 @@
 	import GamePanel from '../GamePanel.svelte';
 	import { onMount } from 'svelte';
 	import type { Game } from '$lib/types/Game';
+	import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
     
     export let data: PageData;
 	let gamesList: Game[]
 
 	function getGames(): Promise<Game[]> {
-		return fetch('http://localhost:5190/Game')
+		return fetch(PUBLIC_BACKEND_ADDRESS + '/Game')
 			.then(response => response.json())
 			.then( response => {
 				return response as Game[]
-			})
+			})	
 	}
 
 	onMount(() => {
