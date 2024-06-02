@@ -11,7 +11,7 @@
         let formattedSeconds = seconds.toFixed(2);
         return formattedSeconds;
     }
-
+    
     let ms = 10;
     let countdown = color === 'black' ? get(clock).black : get(clock).white;
     let now = Date.now();
@@ -83,12 +83,14 @@
     });
 </script>
 
-<p>
-    {countdown}
-    {#if showDifference}
-        <span class="difference" style="color: {differenceColor}" out:fade={{ delay: 1000, duration: 2000 }}>{difference}</span>
-    {/if}
-</p>
+<div class="clock">
+    <p>
+        {countdown}
+        {#if showDifference}
+            <span class="difference" style="color: {differenceColor}" out:fade={{ delay: 1000, duration: 2000 }}>{difference}</span>
+        {/if}
+    </p>
+</div>
 
 <style>
     .difference {

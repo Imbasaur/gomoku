@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { gameCode, moves, displayBoard, latestMove, winningStones } from "$lib/stores";
+	import { moves, displayBoard, winningStones, gameInfo } from "$lib/stores";
     import { move } from "$lib/services/game-hub-client";
 
     function handleClick(e:any, column:number, row:number){
         if (e.currentTarget.getAttribute('disabled') == null){
-            move($gameCode, numToAlpha(column) + row);
+            move($gameInfo.code, numToAlpha(column) + row);
             console.log("Clientside - Node " + numToAlpha(column) + row )
         }
     }
@@ -259,10 +259,10 @@
     }
 
     .border::after {
-        left: 2px;
-        top: 2px;
-        width: 22px;
-        height: 22px;
+        left: 3px;
+        top: 3px;
+        width: 20px !important;
+        height: 20px !important;
         border: 2px solid red;
         border-radius: 50%;
         background-color: transparent;

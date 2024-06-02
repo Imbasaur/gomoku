@@ -1,9 +1,10 @@
 
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-import { player, gameCode, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones } from "$lib/stores";
+import { player, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones, gameInfo } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 import type { GameFinished } from "$lib/responses/gameFinished";
+import type { Game } from "$lib/types/Game";
 
 // store values
 let playerSub: string = "", movesSub: string[], gameFinishedSub: boolean
@@ -33,11 +34,11 @@ connection.on('PlayerLeftWaitingList', name => {
     console.log('Player ' + name + ' left waiting list.');
 })
 
-connection.on('GameCreated', name => {
-    const request: Join = {code: name, playerName: playerSub}
+connection.on('GameCreated', (game: Game) => {
+    const request: Join = {code: game.code, playerName: playerSub}
     connection.invoke('Join', request)
-    gameCode.set(name)
-    console.log('Game ' + name + ' created.');
+    gameInfo.set(game)
+    console.log('Game ' + game.code + ' created.');
 })
 
 connection.on('PlayerConnected', name => {

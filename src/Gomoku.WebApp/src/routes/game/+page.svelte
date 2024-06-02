@@ -2,7 +2,7 @@
     import type { PageData } from './$types';
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
-	import { player } from '$lib/stores';
+	import { displayBoard, player, playerReady } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
 	import { onMount } from 'svelte';
 	import type { Game } from '$lib/types/Game';
@@ -39,9 +39,14 @@
 		</ul>
 	{/if} -->
 
-	{#if $player != ''}
+	{#if $player != '' && !$displayBoard}
 	<div>
-		<p>Player name is {$player}</p>
+		<p>
+			Welcome <b>{$player}</b>!<br>
+			{#if !$playerReady}
+				Press button below to start searching for a game
+			{/if}
+		</p>
 	</div>
 	{/if}
 

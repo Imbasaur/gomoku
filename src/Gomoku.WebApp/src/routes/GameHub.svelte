@@ -1,15 +1,28 @@
 <script lang="ts" >
-	import { playerReady } from "$lib/stores";
+	import { displayBoard, playerReady } from "$lib/stores";
 
     function triggerPlayerReady() {
         $playerReady = !$playerReady;
     };
 </script>
 
-<button on:click|preventDefault={triggerPlayerReady}>
+{#if !$displayBoard}
+    <button id="hub-button" on:click|preventDefault={triggerPlayerReady}>
+        {#if $playerReady}
+            Cancel
+        {:else}
+            Find game
+        {/if}
+    </button>
+    
     {#if $playerReady}
-        Cancel
-    {:else}
-        Find game
+        <p>Searching for an opponent</p>
     {/if}
-</button>
+{/if}
+
+<style>
+    #hub-button{
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>

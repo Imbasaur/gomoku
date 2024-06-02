@@ -1,15 +1,15 @@
 import { writable, readable } from "svelte/store";
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 import type { Clock } from "$lib/types/Clock";
+import type { Game } from "./types/Game";
 
 const name: string = uniqueNamesGenerator({
-    dictionaries: [adjectives, colors, animals]
-  }); 
+  dictionaries: [adjectives, animals]
+}); 
   
-
 export const player = readable<string>(name);
 
-export const gameCode = writable<string>('');
+export const gameInfo = writable<Game>();
 export const moves = writable<string[]>([]);
 export const latestMove = writable<string>('');
 export const activePlayer = writable<string>('');

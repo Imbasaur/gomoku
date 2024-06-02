@@ -42,12 +42,14 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         await repository.AddAsync(game);
         await waitingListRepository.DeleteManyAsync(x => x.PlayerName == players[0].PlayerName || x.PlayerName == players[1].PlayerName);
 
-        await gameHub.Clients.Client(players[0].ConnectionId).SendAsync("GameCreated", game.Code);
-        await gameHub.Clients.Client(players[1].ConnectionId).SendAsync("GameCreated", game.Code); // how to handle observers, add them to gorup? is there any limit in groups?
+        var gameInfo = mapper.Map<GameCreatedDto>(game);
+
+        await gameHub.Clients.Client(players[0].ConnectionId).SendAsync("GameCreated", gameInfo);
+        await gameHub.Clients.Client(players[1].ConnectionId).SendAsync("GameCreated", gameInfo); // how to handle observers, add them to gorup? is there any limit in groups?
 
         // todo: disconnect clients?
 
-        return mapper.Map<GameCreatedDto>(game);
+        return gameInfo;
     }
 
     public async Task<GameDto> Get(Guid gameCode)
