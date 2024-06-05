@@ -27,7 +27,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var gameCode = Guid.NewGuid();
 
         var randomNumber = new Random().Next(0, 2);
-        var gameTime = 10; // todo: should be configurable later
+        var gameTime = 300; // todo: should be configurable later
         var game = new Game
         {
             BlackName = players[randomNumber].PlayerName,

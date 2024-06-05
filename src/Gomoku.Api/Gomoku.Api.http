@@ -1,21 +1,58 @@
-@Gomoku.Api_HostAddress = http://localhost:5190
+@Gomoku.Api_HostAddress = https://localhost:5191
 
-GET {{Gomoku.Api_HostAddress}}/Test/
-Accept: application/json
 
-###
 
-GET {{Gomoku.Api_HostAddress}}/Game/
-Accept: application/json
+POST {{Gomoku.Api_HostAddress}}/game
 
 ###
 
-GET {{Gomoku.Api_HostAddress}}/WaitingList/
-Accept: application/json
+GET {{Gomoku.Api_HostAddress}}/game
 
 ###
 
-GET {{Gomoku.Api_HostAddress}}/WaitingList/count
-Accept: application/json
+GET {{Gomoku.Api_HostAddress}}/game/{code}
+
+###
+
+PUT {{Gomoku.Api_HostAddress}}/game/join
+Content-Type: application/json
+
+{
+  //JoinGameRequest
+}
+
+###
+
+POST {{Gomoku.Api_HostAddress}}/game/move
+Content-Type: application/json
+
+{
+  //AddMoveRequest
+}
+
+###
+
+GET {{Gomoku.Api_HostAddress}}/test
+
+###
+
+GET {{Gomoku.Api_HostAddress}}/waitinglist
+
+###
+
+DELETE {{Gomoku.Api_HostAddress}}/waitinglist/string
+
+###
+
+GET {{Gomoku.Api_HostAddress}}/waitinglist/count
+
+###
+
+POST {{Gomoku.Api_HostAddress}}/waitinglist/join
+Content-Type: application/json
+
+{
+  //JoinWaitingListRequest
+}
 
 ###
