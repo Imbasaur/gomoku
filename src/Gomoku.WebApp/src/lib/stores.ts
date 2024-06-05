@@ -18,4 +18,5 @@ export const clock = writable<Clock>();
 export const displayBoard = writable<boolean>(false);
 export const playerReady = writable<boolean>(false);
 export const gameFinished = writable<boolean>(false);
-export const winningStones = writable<string[]>([])
+export const winningStones = writable<string[]>([]);
+export const gameWinner = writable<string>('');

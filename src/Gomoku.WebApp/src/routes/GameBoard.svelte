@@ -22,9 +22,9 @@
     function addStone(node: string, index: number){
         console.log('Adding stone on ' + node)
         let element = document.getElementById("node-" + node);
-        let oldLatest = document.getElementsByClassName("border")[0];
-        oldLatest?.classList.remove("border");
-        element?.classList.add(getColor(index), "border")
+        let oldLatest = document.getElementsByClassName("stone-border")[0];
+        oldLatest?.classList.remove("stone-border");
+        element?.classList.add(getColor(index), "stone-border")
         element?.setAttribute('disabled', '');
     }
 
@@ -35,7 +35,7 @@
             if (value.length > 0){
                 value.forEach((node) => {
                     let element = document.getElementById("node-" + node)
-                    element?.classList.add("border")
+                    element?.classList.add("stone-border")
                 })
             }
         })
@@ -258,11 +258,9 @@
         display: inline-block;
     }
 
-    .border::after {
+    .stone-border::after {
         left: 3px;
         top: 3px;
-        width: 20px !important;
-        height: 20px !important;
         border: 2px solid red;
         border-radius: 50%;
         background-color: transparent;
