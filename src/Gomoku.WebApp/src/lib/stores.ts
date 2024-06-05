@@ -20,3 +20,5 @@ export const playerReady = writable<boolean>(false);
 export const gameFinished = writable<boolean>(false);
 export const winningStones = writable<string[]>([]);
 export const gameWinner = writable<string>('');
+
+export const afterGameModal = writable<boolean>(false);

@@ -1,13 +1,23 @@
 <script lang="ts" >
-	import { displayBoard, playerReady } from "$lib/stores";
+	import { activePlayer, afterGameModal, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, playerReady, winningStones } from "$lib/stores";
 	import { Button, Spinner } from "flowbite-svelte";
     const hubConnectBtn = () => {
         $playerReady = !$playerReady
+        if ($displayBoard){
+            $displayBoard = false
+            $gameFinished = false
+            $winningStones = []
+            $clock = 
+            $activePlayer = ''
+            $latestMove = ''
+            $gameInfo = null
+            $moves = []
+        }
     }
 
 </script>
 
-{#if !$displayBoard}
+{#if !$displayBoard || (!$playerReady && !$afterGameModal)}
 
     <Button class="my-10" on:click={hubConnectBtn}>
         {#if $playerReady}

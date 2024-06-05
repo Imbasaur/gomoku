@@ -5,7 +5,7 @@
 </script>
 
 
-{#if $displayBoard == true}
+{#if $displayBoard}
     <div id="panel">
         <div class="game-info">
             <p>Variant: {GameVariant[$gameInfo.variant]}</p>

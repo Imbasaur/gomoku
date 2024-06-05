@@ -1,10 +1,11 @@
 
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-import { player, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones, gameInfo } from "$lib/stores";
+import { player, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones, gameInfo, gameWinner } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 import type { GameFinished } from "$lib/responses/gameFinished";
 import type { Game } from "$lib/types/Game";
+import type { Clock } from "$lib/types/Clock";
 import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
 
 // store values
@@ -39,6 +40,7 @@ connection.on('GameCreated', (game: Game) => {
     const request: Join = {code: game.code, playerName: playerSub}
     connection.invoke('Join', request)
     gameInfo.set(game)
+    clock.set({ black: game.time, white: game.time})
     console.log('Game ' + game.code + ' created.');
 })
 
@@ -66,18 +68,20 @@ connection.on('MoveAdded', (response: MoveAdded) => {
 connection.on('GameFinished', (response: GameFinished) => {
     if (!gameFinishedSub){
         winningStones.set(response.winningStones)
+        gameWinner.set(response.winner)
         console.log('SignalR - Game finished and the winner is  ' + response.winner)
-        alert(response.winner + ' won the game!')
-        gameFinished.set(true);
+        gameFinished.set(true)
+        playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
     }
     // todo: disable board, allow to make new game
 })
 
 connection.on('GameFinishedByPlayerTimeout', winner => {
     if (!gameFinishedSub){
+        gameWinner.set(winner)
         console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
-        alert(winner + ' won the game!')
         gameFinished.set(true);
+        playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
     }
     // todo: disable board, allow to make new game
 })

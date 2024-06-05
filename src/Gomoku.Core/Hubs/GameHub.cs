@@ -24,6 +24,7 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         await waitingListService.Remove(Context.ConnectionId);
+        // todo: finish game when someone close/refresh page, but onDisconnected isnt called then
 
         await base.OnDisconnectedAsync(exception);
     }

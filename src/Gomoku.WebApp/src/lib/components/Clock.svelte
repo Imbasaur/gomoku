@@ -21,6 +21,8 @@
     let differenceColor = '';
     let differenceSymbol = '';
 
+    let interval;
+
     const unsubscribeClock = clock.subscribe(async ($clock) => {
         let newCountdown = color === 'black' ? $clock.black : $clock.white;
         let otherCountdown = color === 'black' ? $clock.white : $clock.black;
@@ -28,9 +30,9 @@
         let oldCountdownMs = countdown * 1000;
         let diffMs = Math.abs(newCountdownMs - oldCountdownMs);
 
-        let shouldShowDifference = !(newCountdown === 60 && otherCountdown === 60) && diffMs !== 0;
+        let shouldShowDifference = !(newCountdown === 60 && otherCountdown === 60) && diffMs !== 0 && !isNaN(diffMs);
 
-        if (shouldShowDifference) {
+        if (shouldShowDifference && diffMs !== undefined) {
             if (newCountdownMs < oldCountdownMs) {
                 differenceColor = 'red';
                 differenceSymbol = '-';
@@ -40,6 +42,7 @@
             }
 
             difference = differenceSymbol + formatMs(diffMs);
+
             showDifference = true;
 
             await tick();
@@ -54,10 +57,9 @@
         end = now + countdown * 1000;
     });
 
-    const unsubscribeGameFinished  = gameFinished.subscribe(($gameFinished) => {
-        if ($gameFinished)
-            clearInterval(interval)
-    })
+    const unsubscribeGameFinished = gameFinished.subscribe(($gameFinished) => {
+        if ($gameFinished) clearInterval(interval);
+    });
 
     const updateTimer = () => {
         if (color === get(activePlayer)) {
@@ -68,19 +70,18 @@
                 console.log(`color: ${color}, countdown: ${countdown}, remainingTime: ${remainingTime}, diffMs: ${difference}`);
             } else {
                 countdown = '0.00';
-                // todo: Call backend? maybe not needed with backend timer
                 clearInterval(interval);
             }
         }
     };
-
-    let interval = setInterval(updateTimer, ms);
 
     onDestroy(() => {
         clearInterval(interval);
         unsubscribeClock();
         unsubscribeGameFinished();
     });
+
+    interval = setInterval(updateTimer, ms);
 </script>
 
 <div class="clock">

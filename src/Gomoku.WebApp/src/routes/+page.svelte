@@ -1,6 +1,7 @@
 <script>
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import { Button } from 'flowbite-svelte';
 </script>
 
 <svelte:head>
@@ -16,13 +17,12 @@
 				<img src={welcome_fallback} alt="Welcome" />
 			</picture>
 		</span>
-
-		to your new<br />SvelteKit app
 	</h1>
 	
 	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
+		ready to play some gomoku?<br>
 	</h2>
+	<Button class="mt-5" href="/game">Let's go</Button>
 </section>
 
 <style>
