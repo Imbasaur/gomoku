@@ -67,7 +67,6 @@
             let remainingTime = end - now;
             if (remainingTime > 0) {
                 countdown = formatMs(remainingTime);
-                console.log(`color: ${color}, countdown: ${countdown}, remainingTime: ${remainingTime}, diffMs: ${difference}`);
             } else {
                 countdown = '0.00';
                 clearInterval(interval);

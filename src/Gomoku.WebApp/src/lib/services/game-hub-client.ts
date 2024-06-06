@@ -29,11 +29,11 @@ playerReady.subscribe((value) => {
 })
 
 connection.on('PlayerJoinedWaitingList', name => {
-    console.log('Player ' + name + ' joined waiting list.');
+    // todo remove?
 })
 
 connection.on('PlayerLeftWaitingList', name => {
-    console.log('Player ' + name + ' left waiting list.');
+    // todo remove?
 })
 
 connection.on('GameCreated', (game: Game) => {
@@ -41,18 +41,15 @@ connection.on('GameCreated', (game: Game) => {
     connection.invoke('Join', request)
     gameInfo.set(game)
     clock.set({ black: game.time, white: game.time})
-    console.log('Game ' + game.code + ' created.');
 })
 
 connection.on('PlayerConnected', name => {
     if (name == playerSub)
         displayBoard.set(true)
-    console.log('Player ' + name + ' connected.');
 })
 
 connection.on('PlayersConnected', () => {
     // todo: start the game etc
-    console.log('Both players connected.');
 })
 
 connection.on('MoveAdded', (response: MoveAdded) => {
@@ -60,16 +57,12 @@ connection.on('MoveAdded', (response: MoveAdded) => {
     moves.update(items => ([...items, response.move]))
     clock.set(response.clock)
     activePlayer.set(getActivePlayer());
-    console.log('SignalR - Clock:' + JSON.stringify(response.clock));
-    console.log('SignalR - Move added at ' + response.move + ' by ' + getcolor() + '.');
-    console.log('SignalR - Moves so far: ' + movesSub);
 })
 
 connection.on('GameFinished', (response: GameFinished) => {
     if (!gameFinishedSub){
         winningStones.set(response.winningStones)
         gameWinner.set(response.winner)
-        console.log('SignalR - Game finished and the winner is  ' + response.winner)
         gameFinished.set(true)
         playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
     }
@@ -79,7 +72,6 @@ connection.on('GameFinished', (response: GameFinished) => {
 connection.on('GameFinishedByPlayerTimeout', winner => {
     if (!gameFinishedSub){
         gameWinner.set(winner)
-        console.log('SignalR - Game finished by player timeout and the winner is  ' + winner);
         gameFinished.set(true);
         playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
     }

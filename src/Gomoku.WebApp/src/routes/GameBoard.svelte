@@ -5,7 +5,6 @@
     function handleClick(e:any, column:number, row:number){
         if (e.currentTarget.getAttribute('disabled') == null){
             move($gameInfo.code, numToAlpha(column) + row);
-            console.log("Clientside - Node " + numToAlpha(column) + row )
         }
     }
 
@@ -20,7 +19,6 @@
     }
     
     function addStone(node: string, index: number){
-        console.log('Adding stone on ' + node)
         let element = document.getElementById("node-" + node);
         let oldLatest = document.getElementsByClassName("stone-border")[0];
         oldLatest?.classList.remove("stone-border");
