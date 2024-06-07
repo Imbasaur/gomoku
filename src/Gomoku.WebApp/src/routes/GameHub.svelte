@@ -1,17 +1,11 @@
 <script lang="ts" >
-	import { activePlayer, afterGameModal, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, playerReady, winningStones } from "$lib/stores";
+	import { afterGameModal, displayBoard, playerReady } from "$lib/stores";
+	import { clearBoard } from "$lib/utils";
 	import { Button, Spinner } from "flowbite-svelte";
     const hubConnectBtn = () => {
         $playerReady = !$playerReady
         if ($displayBoard){
-            $displayBoard = false
-            $gameFinished = false
-            $winningStones = []
-            $clock = 
-            $activePlayer = ''
-            $latestMove = ''
-            $gameInfo = null
-            $moves = []
+            clearBoard()
         }
     }
 

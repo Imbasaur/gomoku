@@ -8,6 +8,7 @@
 	import type { Game } from '$lib/types/Game';
 	import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
   	import { Button, Modal } from 'flowbite-svelte';
+	import { clearBoard } from '$lib/utils';
     
     export let data: PageData;
 	let gamesList: Game[]
@@ -26,15 +27,8 @@
 			})	
 	}
     const playNextBtn = () => {
-            $displayBoard = false
-			$playerReady = true
-            $gameFinished = false
-            $winningStones = []
-            $clock = 
-            $activePlayer = ''
-            $latestMove = ''
-            $gameInfo = null
-            $moves = []
+		clearBoard()
+		$playerReady = true
     }
 
     const finishPlayingBtn = () => {

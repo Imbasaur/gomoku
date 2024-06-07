@@ -1,11 +1,9 @@
-
 import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { player, moves, latestMove, displayBoard, clock, playerReady, activePlayer, gameFinished, winningStones, gameInfo, gameWinner } from "$lib/stores";
 import type { Join } from "$lib/requests/join";
 import type { MoveAdded } from "$lib/responses/moveAdded";
 import type { GameFinished } from "$lib/responses/gameFinished";
 import type { Game } from "$lib/types/Game";
-import type { Clock } from "$lib/types/Clock";
 import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
 
 // store values
@@ -18,7 +16,7 @@ gameFinished.subscribe((value) => (gameFinishedSub = value));
 const connection = new HubConnectionBuilder()
     .withUrl(PUBLIC_BACKEND_ADDRESS + "/gameHub?username=" + playerSub) // todo check if name is being sent
     .configureLogging(LogLevel.Debug)
-    .withAutomaticReconnect()
+    // .withAutomaticReconnect() // todo: disable reconnect untill player accounts
     .build();
 
 playerReady.subscribe((value) => {
@@ -77,12 +75,6 @@ connection.on('GameFinishedByPlayerTimeout', winner => {
     }
     // todo: disable board, allow to make new game
 })
-
-function getcolor(){
-    if (movesSub.length % 2 == 1)
-        return "black"
-    return "white"
-}
 
 function getActivePlayer(){
     if (movesSub.length % 2 == 0)

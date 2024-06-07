@@ -1,5 +1,5 @@
 <script>
-    import { activePlayer, clock, gameFinished } from "$lib/stores";
+    import { activePlayer, clock, gameFinished, gameInfo } from "$lib/stores";
     import { onDestroy, tick } from "svelte";
     import { get } from 'svelte/store';
     import { fade } from 'svelte/transition';
@@ -30,7 +30,7 @@
         let oldCountdownMs = countdown * 1000;
         let diffMs = Math.abs(newCountdownMs - oldCountdownMs);
 
-        let shouldShowDifference = !(newCountdown === 60 && otherCountdown === 60) && diffMs !== 0 && !isNaN(diffMs);
+        let shouldShowDifference = !(newCountdown === $gameInfo.time && otherCountdown === $gameInfo.time) && diffMs !== 0 && !isNaN(diffMs);
 
         if (shouldShowDifference && diffMs !== undefined) {
             if (newCountdownMs < oldCountdownMs) {
