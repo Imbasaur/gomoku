@@ -1,37 +1,43 @@
-﻿# Gomoku
-
+﻿# Gomoku [![NuGet Package](https://img.shields.io/badge/.NET%20-8.0-blue.svg)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) [![GitHub license](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ktutak1337/Stellar-Chat/blob/main/LICENSE.md) [![100 - commitow](https://img.shields.io/badge/100%20-commitow-blue.svg)](https://100commitow.pl)
 Gomoku, also called Five in a Row, is an abstract strategy board game.
+This web application allows playing the game with one button matchmaking.
+![](https://github.com/Imbasaur/gomoku/tree/main/assets/demo.gif)
 
-This open-source project aims to provide a place for playing Gomoku for everyone.
+> [!NOTE]
+> Current version is available [here](https://gomoku100.vercel.app)
 
 ## Goal
 
- **One button matchmaking**: Enable people to play games without any overhead of creating accounts, searching for tables/open games, etc.
- 
- **Catch-up with C# stuff**: Get along with the latest c# and .net features, as I am stuck on .net core 3.1 and C# 8.0
- 
- **Learn front-end**: Learn basic stuff with the chosen front-end framework
+:white_check_mark: **One button matchmaking**: Enable people to play games without any overhead of creating accounts, searching for tables/open games, etc.
 
 ## Optional
-If the goal will be ever completed...
 
-* Ingame/global chat
-* Private messages or private chat between players
-* Player accounts
-* Player/global statistics
-* Leaderboard + rating system
-* Saving/Loading games and playing them
-* Public API for accessing played games
-* Tournament system for private and public tournaments
-* Analysis of played games (maybe integration with game engines?)
-* Game variants (swap, swap2 etc)
-* Learn to play, puzzles
+:white_square_button: Ingame/global chat
+
+:white_square_button: Private messages or private chat between players
+
+:white_square_button: Player accounts
+
+:white_square_button: Player/global statistics
+
+:white_square_button: Leaderboard + rating system
+
+:white_square_button: Saving/Loading games and playing them
+
+:white_square_button: Public API for accessing played games
+
+:white_square_button: Tournament system for private and public tournaments
+
+:white_square_button: Analysis of played games (maybe integration with game engines?)
+
+:white_square_button: Game variants (swap, swap2 etc)
+
+:white_square_button: Learn to play, puzzles
 
 ## Technology
 * .Net on backend
 * SignalR and web api to communicate between frontend and backend
-* Frontent in Svelte
-* TBC
+* Frontend in Svelte
 
 ## Contributing
 
