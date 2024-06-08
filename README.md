@@ -1,7 +1,12 @@
 ﻿# Gomoku [![NuGet Package](https://img.shields.io/badge/.NET%20-8.0-blue.svg)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) [![GitHub license](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ktutak1337/Stellar-Chat/blob/main/LICENSE.md) [![100 - commitow](https://img.shields.io/badge/100%20-commitow-blue.svg)](https://100commitow.pl)
 Gomoku, also called Five in a Row, is an abstract strategy board game.
 This web application allows playing the game with one button matchmaking.
-![](https://github.com/Imbasaur/gomoku/tree/main/assets/demo.gif)
+
+<p align="center">
+  
+  ![](https://raw.githubusercontent.com/Imbasaur/gomoku/main/assets/demo.gif)
+  
+</p>
 
 > [!NOTE]
 > Current version is available [here](https://gomoku100.vercel.app)
