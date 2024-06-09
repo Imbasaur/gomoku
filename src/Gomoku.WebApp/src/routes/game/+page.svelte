@@ -2,7 +2,7 @@
     import type { PageData } from './$types';
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
-	import { activePlayer, afterGameModal, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, player, playerReady, winningStones } from '$lib/stores';
+	import { afterGameModal, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, player, playerReady, winningStones } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
 	import { onMount } from 'svelte';
 	import type { Game } from '$lib/types/Game';
@@ -11,7 +11,6 @@
 	import { clearBoard } from '$lib/utils';
     
     export let data: PageData;
-	let gamesList: Game[]
 
 	gameFinished.subscribe((value) => {
 		if (value && !$afterGameModal){
@@ -19,13 +18,6 @@
 		}
 	})
 
-	function getGames(): Promise<Game[]> {
-		return fetch(PUBLIC_BACKEND_ADDRESS + '/Game')
-			.then(response => response.json())
-			.then( response => {
-				return response as Game[]
-			})	
-	}
     const playNextBtn = () => {
 		clearBoard()
 		$playerReady = true

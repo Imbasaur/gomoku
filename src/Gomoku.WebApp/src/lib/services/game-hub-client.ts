@@ -82,11 +82,6 @@ function getActivePlayer(){
     return "white"
 }
 
-// todo fix error Function called outside component initialization
-// onDestroy(async () => {  
-//     await connection.stop();
-// });
-
 export async function move(code:string, move:string){
     try {
         const request = { code: code, move: move };
