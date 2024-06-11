@@ -20,7 +20,7 @@ This web application allows playing the game with one-button matchmaking.
 
 ## Planned Features
 > [!IMPORTANT]
-> The ultimate goal is to create a modern website for the Gomoku community to play games casual games, ranked tournaments and much more.
+> The ultimate goal is to create a modern website for the Gomoku community to play casual games, ranked tournaments and much more.
 >
 > Below you can see a list of planned features, feel free to contribute :)
 >
@@ -58,7 +58,7 @@ Contributions to the Gomoku project are welcome!
 
 ## #100commitow
 
-The main reason this repo is created and maintained is the one hundred commits challenge, visit https://100commitow.pl/ for more.
+The main reason this repo is created and maintained is the one hundred commits challenge. Visit https://100commitow.pl/ for more information.
 
 ## License
 
