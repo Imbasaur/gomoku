@@ -1,13 +1,23 @@
 <script lang="ts">
-	import { createHubConnection } from '$lib/gameHub';
+	import { createHubConnection, stopHubConnection } from '$lib/gameHub';
 	import '../app.css';
 	import Header from './Header.svelte';
 	import './styles.css';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
-    onMount(() => {
-        createHubConnection();
+	onMount(() => {
+    createHubConnection();
+
+    const handleBeforeUnload = () => {
+        stopHubConnection();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    onDestroy(() => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
     });
+});
 </script>
 
 <div class="app">

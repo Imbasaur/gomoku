@@ -37,10 +37,18 @@ public class WaitingListService(IWaitingListRepository repository, IMapper mappe
 
     public async Task Remove(string connectionId)
     {
-        await repository.DeleteAsync(x => x.ConnectionId.ToLower().Equals(connectionId.ToLower())); // this will be account id in future
+        if (string.IsNullOrEmpty(connectionId))
+            return;
 
-        await hub.Clients.All.SendAsync("PlayerLeftWaitingList", connectionId);
+        try
+        {
+            await repository.DeleteAsync(x => x.ConnectionId.ToLower().Equals(connectionId.ToLower())); // this will be account id in future
 
-        return;
+            await hub.Clients.All.SendAsync("PlayerLeftWaitingList", connectionId);
+        }
+        catch (Exception ex) 
+        {
+            // if DeleteAsync fails, then we can continue without sending hub message
+        }
     }
 }

@@ -23,7 +23,7 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         await waitingListService.Remove(Context.ConnectionId);
-        // todo: finish game when someone close/refresh page, but onDisconnected isnt called then. Maybe on ping failed few times.
+        await gameService.FinishGamesByDisconnect(Context.GetHttpContext().Request.Query["username"]);
 
         await base.OnDisconnectedAsync(exception);
     }

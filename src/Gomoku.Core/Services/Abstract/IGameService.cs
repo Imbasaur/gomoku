@@ -10,4 +10,5 @@ public interface IGameService
     Task Join(Guid code, string playerName, string connectionId = null);
     Task AddMove(Guid code, string move, string playerName);
     Task CheckTimeoutWin(Guid gameCode);
+    Task FinishGamesByDisconnect(string playerName);
 }

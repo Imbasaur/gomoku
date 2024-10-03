@@ -88,7 +88,17 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     hubConnection.on('GameFinishedByPlayerTimeout', response => {
         console.log('Game finished by player timeout:', response);
         if (!get(gameFinished)){
-            gameWinner.set(response)
+            gameWinner.set(response.winner)
+            gameFinished.set(true);
+            playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
+        }
+        // todo: disable board, allow to make new game
+    });
+
+    hubConnection.on('GameFinishedByPlayerDisconnect', response => {
+        console.log('Game finished by player timeout:', response);
+        if (!get(gameFinished)){
+            gameWinner.set(response.winner)
             gameFinished.set(true);
             playerReady.set(false) // todo: should probably keep connection little longer for rematch scenario
         }

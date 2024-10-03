@@ -118,7 +118,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     {
         var moveTime = DateTime.UtcNow; // todo: should be client time? how to handle lags, cheating?
 
-        // move will be validated already validated
+        // move will be already validated
         var game = await repository.GetAsync(x => x.Code == code);
         ArgumentNullException.ThrowIfNull(game);
 
@@ -182,6 +182,23 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         }
 
         await repository.UpdateAsync(game);
+    }
+
+    public async Task FinishGamesByDisconnect(string playerName)
+    {
+        var games = await repository.GetManyAsync(x => x.BlackName == playerName || x.WhiteName == playerName);
+
+        foreach (var game in games)
+        {
+            gameTimeoutManager.StopTracking(game.Code);
+            game.Winner = playerName == game.WhiteName ? game.BlackName : game.WhiteName;
+            game.State = GameState.Finished;
+            await repository.UpdateAsync(game);
+            await gameHub.Clients.Group(game.Code.ToString()).SendAsync("GameFinishedByPlayerDisconnect", new GameFinished
+            {
+                Winner = game.Winner
+            });
+        }
     }
 
     public async Task CheckTimeoutWin(Guid gameCode)
