@@ -1,7 +1,13 @@
-<script>
+<script lang="ts">
+	import { createHubConnection } from '$lib/gameHub';
 	import '../app.css';
 	import Header from './Header.svelte';
 	import './styles.css';
+	import { onMount } from 'svelte';
+
+    onMount(() => {
+        createHubConnection();
+    });
 </script>
 
 <div class="app">

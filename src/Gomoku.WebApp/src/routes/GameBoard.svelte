@@ -1,10 +1,10 @@
 <script lang="ts">
+	import { sendMove } from "$lib/gameActions";
 	import { moves, displayBoard, winningStones, gameInfo } from "$lib/stores";
-    import { move } from "$lib/services/game-hub-client";
 
     function handleClick(e:any, column:number, row:number){
         if (e.currentTarget.getAttribute('disabled') == null){
-            move($gameInfo.code, numToAlpha(column) + row);
+            sendMove($gameInfo.code, numToAlpha(column) + row);
         }
     }
 

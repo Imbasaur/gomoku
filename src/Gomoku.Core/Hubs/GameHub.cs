@@ -15,7 +15,6 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
     public override async Task OnConnectedAsync()
     {
         var username = Context.GetHttpContext().Request.Query["username"]; // todo: remove when accounts will be added
-        await waitingListService.Add(username, Context.ConnectionId);
         logger.LogInformation($"New client connected to {nameof(GameHub)} with connectionId {Context.ConnectionId}, username: {username}");
 
         await base.OnConnectedAsync();
@@ -24,12 +23,20 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         await waitingListService.Remove(Context.ConnectionId);
-        // todo: finish game when someone close/refresh page, but onDisconnected isnt called then
+        // todo: finish game when someone close/refresh page, but onDisconnected isnt called then. Maybe on ping failed few times.
 
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task<bool> Join(JoinGameRequest request)
+    public async Task<bool> JoinWaitingList()
+    {
+        var username = Context.GetHttpContext().Request.Query["username"]; // todo: remove when accounts will be added
+        await waitingListService.Add(username, Context.ConnectionId);
+
+        return true;
+    }
+
+    public async Task<bool> JoinGame(JoinGameRequest request)
     {
         await gameService.Join(request.Code, request.PlayerName, Context.ConnectionId);
 

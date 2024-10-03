@@ -9,6 +9,7 @@
 	import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
   	import { Button, Modal } from 'flowbite-svelte';
 	import { clearBoard } from '$lib/utils';
+	import { joinWaitingList } from '$lib/gameActions';
     
     export let data: PageData;
 
@@ -21,6 +22,7 @@
     const playNextBtn = () => {
 		clearBoard()
 		$playerReady = true
+		joinWaitingList()
     }
 
     const finishPlayingBtn = () => {

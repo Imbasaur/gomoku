@@ -1,11 +1,14 @@
 <script lang="ts" >
+	import { joinWaitingList } from "$lib/gameActions";
 	import { afterGameModal, displayBoard, playerReady } from "$lib/stores";
 	import { clearBoard } from "$lib/utils";
 	import { Button, Spinner } from "flowbite-svelte";
-    const hubConnectBtn = () => {
-        $playerReady = !$playerReady
-        if ($displayBoard){
-            clearBoard()
+
+    function handleFindGameButtonClick() {
+        joinWaitingList();
+        $playerReady = !$playerReady;
+        if ($displayBoard) {
+            clearBoard();
         }
     }
 
@@ -13,7 +16,7 @@
 
 {#if !$displayBoard || (!$playerReady && !$afterGameModal)}
 
-    <Button class="my-10" on:click={hubConnectBtn}>
+    <Button class="my-10" on:click={handleFindGameButtonClick}>
         {#if $playerReady}
             Cancel
         {:else}
