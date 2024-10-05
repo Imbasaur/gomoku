@@ -1,6 +1,6 @@
 <script lang="ts">
     import { sendMove } from "$lib/gameActions";
-    import { moves, displayBoard, winningStones, gameInfo } from "$lib/stores";
+    import { moves, displayBoard, winningStones, gameInfo, latestMove } from "$lib/stores";
 
     function handleClick(e: any, column: number, row: number) {
         if (e.currentTarget.getAttribute('disabled') == null) {
@@ -17,33 +17,29 @@
         return index !== -1 ? (index % 2 === 0 ? "black" : "white") : "";
     }
 
-    function isWinningStone(node: string) {
-        return $winningStones.includes(node);
-    }
 </script>
-
-{#if $displayBoard}
-    <div id="board">
-        {#each Array.from(Array(15).keys()) as column}
-            <div class="{numToAlpha(column + 1)}">
-                {#each Array.from(Array(15).keys()) as row}
-                    {#if $moves.includes(numToAlpha(column + 1) + (15 - row))}
-                        <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
-                             id="node-{numToAlpha(column + 1)}{15 - row}" 
-                             on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
-                            <div class="stone {getStoneColor(numToAlpha(column + 1) + (15 - row))} {isWinningStone(numToAlpha(column + 1) + (15 - row)) ? 'border' : ''}"></div>
+<div id="board">
+    {#each Array.from(Array(15).keys()) as column}
+        <div class="{numToAlpha(column + 1)}">
+            {#each Array.from(Array(15).keys()) as row}
+                {#if $moves.includes(numToAlpha(column + 1) + (15 - row))}
+                    <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
+                         id="node-{numToAlpha(column + 1)}{15 - row}" 
+                         on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
+                        <div class="stone {getStoneColor(numToAlpha(column + 1) + (15 - row))} 
+                            {($winningStones.includes(numToAlpha(column + 1) + (15 - row)) || (numToAlpha(column + 1) + (15 - row)) === $latestMove) ? 'highlight' : ''}">
                         </div>
-                    {:else}
-                        <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
-                             id="node-{numToAlpha(column + 1)}{15 - row}" 
-                             on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
-                        </div>
-                    {/if}
-                {/each}
-            </div>
-        {/each}
-    </div>
-{/if}
+                    </div>
+                {:else}
+                    <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
+                         id="node-{numToAlpha(column + 1)}{15 - row}" 
+                         on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
+                    </div>
+                {/if}
+            {/each}
+        </div>
+    {/each}
+</div>
 
 <style>
     #board {
@@ -265,7 +261,7 @@
         background-color: white !important;
     }
 
-    .stone.border {
+    .stone.highlight {
         border: 2px solid red;
     }
 </style>

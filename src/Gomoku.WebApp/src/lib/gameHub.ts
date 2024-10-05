@@ -63,7 +63,6 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     });
 
     hubConnection.on('PlayerConnected', name => {
-        console.log('name: '+name+', player: '+player+', eq: '+(name == get(player)))
         if (name == get(player))
             displayBoard.set(true)
     })
