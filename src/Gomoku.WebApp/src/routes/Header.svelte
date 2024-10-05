@@ -20,7 +20,10 @@
 				<a href="/">Home</a>
 			</li>
 			<li aria-current={$page.url.pathname.startsWith('/game') ? 'page' : undefined}>
-				<a href="/game">Play gomoku</a>
+				<a href="/game">Play</a>
+			</li>
+			<li aria-current={$page.url.pathname.startsWith('/observe') ? 'page' : undefined}>
+				<a href="/observe">Watch</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">

@@ -2,8 +2,6 @@ import { writable, readable } from "svelte/store";
 import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 import type { Clock } from "$lib/types/Clock";
 import type { Game } from "./types/Game";
-import { PUBLIC_BACKEND_ADDRESS } from "$env/static/public";
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const name: string = uniqueNamesGenerator({
   dictionaries: [adjectives, animals]
@@ -25,21 +23,4 @@ export const gameWinner = writable<string>('');
 
 export const afterGameModal = writable<boolean>(false);
 
-// Create a writable store to hold the connection
-export const connection = writable<signalR.HubConnection | null>(null);
-
-export function createHubConnection() {
-    // Initialize the SignalR connection
-    const hubConnection = new HubConnectionBuilder()
-        .withUrl(PUBLIC_BACKEND_ADDRESS + "/gameHub?username=" + name)
-        .configureLogging(LogLevel.Debug)
-        .build();
-
-    // Start the connection and update the store
-    hubConnection.start()
-        .then(() => {
-            console.log("SignalR Connection started");
-            connection.set(hubConnection);
-        })
-        .catch(err => console.error("Error starting SignalR connection:", err));
-}
+export const activeGames = writable<Game[]>([]);

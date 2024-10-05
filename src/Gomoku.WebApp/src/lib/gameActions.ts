@@ -19,7 +19,6 @@ export async function sendMove(code: string, move: string) {
     }
 }
 
-// Example of another server method
 export async function joinWaitingList() {
     try {
         const hubConnection = get(connection);
@@ -35,7 +34,7 @@ export async function joinWaitingList() {
     }
 }
 
-export async function joinGame(code: string, playerName: string) {
+export async function joinGame(code: string, playerName: string, asObserver: boolean = false) {
     try {
         const hubConnection = get(connection);
 
@@ -44,9 +43,24 @@ export async function joinGame(code: string, playerName: string) {
             return;
         }
 
-        const request = { code, playerName };
+        const request = { code, playerName, asObserver };
         await hubConnection.invoke("JoinGame", request);
     } catch (error) {
         console.error("Error while joining game:", error);
+    }
+}
+
+export async function subscribe(group: string) {
+    try {
+        const hubConnection = get(connection);
+
+        if (!hubConnection || hubConnection.state !== HubConnectionState.Connected) {
+            console.error("No connection available to subscribe to " + group + " gorup.");
+            return;
+        }
+
+        await hubConnection.invoke("SubscribeGroup", group);
+    } catch (error) {
+        console.error("Error while subscribing to " + group + " group:", error);
     }
 }

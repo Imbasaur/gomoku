@@ -10,6 +10,7 @@ using Gomoku.DAL.Repository;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq.Expressions;
 
 namespace Gomoku.Core.Services;
 public class GameService(IGameRepository repository, IMapper mapper, IWaitingListRepository waitingListRepository, IHubContext<GameHub> gameHub,
@@ -55,15 +56,14 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     public async Task<GameDto> Get(Guid gameCode)
     {
         var game = await repository.GetAsync(x => x.Code == gameCode);
-
         return mapper.Map<GameDto>(game);
     }
 
-    public async Task<IEnumerable<GameDto>> GetAll()
+    public async Task<IEnumerable<GameListDto>> GetMany(Expression<Func<Game, bool>>? predicate = null)
     {
-        var games = await repository.GetManyAsync();
+        var games = await repository.GetManyAsync(predicate);
 
-        return mapper.Map<IEnumerable<GameDto>>(games);
+        return mapper.Map<IEnumerable<GameListDto>>(games);
     }
 
     public async Task SetGameState(Guid code, GameState state)
@@ -71,19 +71,29 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         await repository.SetStateAsync(code, state);
     }
 
-    public async Task Join(Guid code, string playerName, string connectionId = null) // remove = null after removing http call
+    public async Task Join(Guid code, string playerName, string connectionId = null, bool asObserver = false) // remove = null after removing http call
     {
         try
         {
             await gameHub.Groups.AddToGroupAsync(connectionId, code.ToString());
-            await gameHub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName);
-            await repository.ConnectPlayerAsync(code, playerName);
 
-            if (await repository.AreBothPlayersConnectedAsync(code))
+            if (!asObserver)
             {
-                await repository.SetStateAsync(code, GameState.PlayersConnected); // todo: can we just skip playersConnected or there is something to do in between
-                await gameHub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
-                await repository.SetStateAsync(code, GameState.Started);
+                await gameHub.Clients.Group(code.ToString()).SendAsync("PlayerConnected", playerName); // todo: change all hub messages to consts
+                await repository.ConnectPlayerAsync(code, playerName);
+
+                if (await repository.AreBothPlayersConnectedAsync(code))
+                {
+                    await repository.SetStateAsync(code, GameState.PlayersConnected);
+                    await gameHub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
+                }
+            }
+            else
+            {
+                await gameHub.Clients.Group(code.ToString()).SendAsync("ObserverConnected"); // todo: change all hub messages to consts
+                var game = await repository.GetAsync(x => x.Code == code);
+                
+                await gameHub.Clients.Client(connectionId).SendAsync("InitGame", mapper.Map<InitGame>(game));
             }
         }
         catch (DbUpdateConcurrencyException ex)
@@ -99,7 +109,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                     proposedValues["IsWhiteConnected"] = true;
                     proposedValues["State"] = 2;
                     await gameHub.Clients.Group(code.ToString()).SendAsync("PlayersConnected");
-                    proposedValues["State"] = 3;
 
                     entry.OriginalValues.SetValues(databaseValues);
                     await entry.Context.SaveChangesAsync();
@@ -123,12 +132,6 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         var game = await repository.GetAsync(x => x.Code == code);
         ArgumentNullException.ThrowIfNull(game);
 
-        if (game.State == GameState.PlayersConnected)
-            game.State = GameState.Started;
-
-        if (game.State != GameState.Started)
-            throw new GameMoveIncorrectStateException();
-
         var movesList = string.IsNullOrEmpty(game.Moves)
             ? []
             : game.Moves.Split(_movesDelimiter).SkipLast(1).ToList();
@@ -139,6 +142,15 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
         if (!string.IsNullOrEmpty(game.Moves) && game.Moves.Contains($"{move}{_movesDelimiter}", StringComparison.InvariantCultureIgnoreCase))
             throw new GameMoveExistsException();
+
+        if (game.State == GameState.PlayersConnected)
+        {
+            game.State = GameState.Started;
+            await gameHub.Clients.Group("watchlist").SendAsync("GameStarted", new GameListDto(game.Code, game.BlackName, game.WhiteName));
+        }
+
+        if (game.State != GameState.Started)
+            throw new GameMoveIncorrectStateException();
 
         // handle timer
         var activePlayer = (PlayerColor)(movesList.Count % 2);
@@ -173,8 +185,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
                 var blackWon = movesList.IndexOf(move) % 2 == 0;
                 var winnerName = blackWon ? game.BlackName : game.WhiteName;
                 gameTimeoutManager.StopTracking(code);
-                await gameHub.Clients.Group(code.ToString()).SendAsync("GameFinished", new GameFinished
+                await gameHub.Clients.Groups(code.ToString(), "watchlist").SendAsync("GameFinished", new GameFinished
                 {
+                    Code = code.ToString(),
                     Winner = winnerName,
                     WinningStones = [.. winningStones.Split(';')]
                 });
@@ -198,8 +211,9 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
             game.Winner = playerName == game.WhiteName ? game.BlackName : game.WhiteName;
             game.State = GameState.FinishedByPlayerDisconnect;
             await repository.UpdateAsync(game);
-            await gameHub.Clients.Group(game.Code.ToString()).SendAsync("GameFinishedByPlayerDisconnect", new GameFinished
+            await gameHub.Clients.Groups(game.Code.ToString(), "watchlist").SendAsync("GameFinishedByPlayerDisconnect", new GameFinished
             {
+                Code = game.Code.ToString(),
                 Winner = game.Winner
             });
         }
@@ -218,7 +232,11 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
 
         if (CheckTimeoutWinCondition(activePlayer, currentTime, game))
         {
-            await gameHub.Clients.Group(gameCode.ToString()).SendAsync("GameFinishedByPlayerTimeout", game.Winner);
+            await gameHub.Clients.Groups(gameCode.ToString(), "watchlist").SendAsync("GameFinishedByPlayerTimeout", new GameFinished
+            {
+                Code = game.Code.ToString(),
+                Winner = game.Winner
+            });
             await repository.UpdateAsync(game);
         }
     }

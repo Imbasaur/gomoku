@@ -265,7 +265,7 @@
         background-color: white !important;
     }
 
-    .stone-border {
+    .stone.border {
         border: 2px solid red;
     }
 </style>

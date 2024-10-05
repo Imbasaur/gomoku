@@ -1,5 +1,6 @@
 ﻿using Gomoku.Core.Requests;
 using Gomoku.Core.Services.Abstract;
+using Gomoku.DAL.Enums;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -38,7 +39,7 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
 
     public async Task<bool> JoinGame(JoinGameRequest request)
     {
-        await gameService.Join(request.Code, request.PlayerName, Context.ConnectionId);
+        await gameService.Join(request.Code, request.PlayerName, Context.ConnectionId, request.AsObserver);
 
         return true;
     }
@@ -49,5 +50,19 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
         await gameService.AddMove(request.Code, request.Move, username);
 
         return true;
+    }
+
+    public async Task<bool> SubscribeGroup(string group)
+    {
+        // todo: define groups somewhere
+        if (group.Equals("watchlist", StringComparison.InvariantCultureIgnoreCase))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, group);
+            await Clients.Client(Context.ConnectionId).SendAsync("ActiveGames", await gameService.GetMany(x => x.State == GameState.Started));
+
+            return true;
+        }
+
+        return false;
     }
 }

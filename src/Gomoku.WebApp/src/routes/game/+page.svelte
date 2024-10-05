@@ -4,7 +4,6 @@
 	import GameBoard from '../GameBoard.svelte';
 	import { afterGameModal, displayBoard, gameFinished, gameWinner, player, playerReady } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
-	import { onMount } from 'svelte';
   	import { Button, Modal } from 'flowbite-svelte';
 	import { clearBoard } from '$lib/utils';
 	import { joinWaitingList } from '$lib/gameActions';
@@ -45,7 +44,6 @@
 	</div>
 	{/if}
 	
-
 	<GameHub />
 	<div class="game-panel">
 		<GameBoard />
@@ -60,7 +58,6 @@
 			<Button color="alternative" on:click={finishPlayingBtn}>No, let me go</Button>
         </div>
     </Modal>
-	
 </div>
 
 <style>

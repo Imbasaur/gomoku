@@ -1,9 +1,11 @@
 import { writable, get } from 'svelte/store';
 import * as signalR from '@microsoft/signalr';
-import { activePlayer, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, player, playerReady, winningStones } from '$lib/stores';
+import { activeGames, activePlayer, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, player, playerReady, winningStones } from '$lib/stores';
 import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
 import { joinGame } from './gameActions';
 import { HubConnectionState } from '@microsoft/signalr';
+import type { InitGame } from './types/InitGame';
+import type { Game } from './types/Game';
 
 export const connection = writable<signalR.HubConnection | null>(null);
 
@@ -78,6 +80,7 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     });
 
     hubConnection.on('GameFinished', response => {
+        removeActiveGame(response.code);
         console.log('Game finished:', response);
         winningStones.set(response.winningStones);
         gameWinner.set(response.winner);
@@ -86,6 +89,7 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     });
 
     hubConnection.on('GameFinishedByPlayerTimeout', response => {
+        removeActiveGame(response.code);
         console.log('Game finished by player timeout:', response);
         if (!get(gameFinished)){
             gameWinner.set(response.winner)
@@ -97,6 +101,7 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
 
     hubConnection.on('GameFinishedByPlayerDisconnect', response => {
         console.log('Game finished by player timeout:', response);
+        removeActiveGame(response.code);
         if (!get(gameFinished)){
             gameWinner.set(response.winner)
             gameFinished.set(true);
@@ -104,9 +109,53 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
         }
         // todo: disable board, allow to make new game
     });
+
+    hubConnection.on('ObserverConnected', () => {
+    })
+
+    hubConnection.on('InitGame', (init: InitGame)  => {
+        
+        const movesList = init.moves.split(";").filter(move => move !== "");
+
+        gameInfo.set({
+            blackName: init.blackName,
+            whiteName: init.whiteName,
+            time: init.time,
+            variant: init.variant,
+            code: '',
+            state: 0
+        });
+        clock.set({ black: init.clock.black, white: init.clock.white });
+        latestMove.set(movesList.at(-1) || "");
+        moves.set(movesList);
+        activePlayer.set(getActivePlayer());
+        displayBoard.set(true)
+    })
+
+    hubConnection.on('ActiveGames', (games: Game[]) => {
+        activeGames.set(games);
+    })
+
+    hubConnection.on('GameStarted', (newGame: Game) => {
+        activeGames.update(games => {
+            const gameExists = games.some(game => game.code === newGame.code);
+    
+            if (!gameExists) {
+                return [...games, newGame];
+            }
+    
+            return games;
+        });
+    })
 }
 
 // Helper function
 function getActivePlayer() {
     return get(moves).length % 2 === 0 ? "black" : "white";
+}
+
+function removeActiveGame(code: string) {
+    activeGames.update(games => {
+        return games.filter(game => game.code !== code)
+    })
 }
