@@ -37,6 +37,13 @@ public class GameHub(ILogger<GameHub> logger, IGameService gameService, IWaiting
         return true;
     }
 
+    public async Task<bool> LeaveWaitingList()
+    {
+        await waitingListService.Remove(Context.ConnectionId);
+
+        return true;
+    }
+
     public async Task<bool> JoinGame(JoinGameRequest request)
     {
         await gameService.Join(request.Code, request.PlayerName, Context.ConnectionId, request.AsObserver);

@@ -30,7 +30,22 @@ export async function joinWaitingList() {
 
         await hubConnection.invoke("JoinWaitingList");
     } catch (error) {
-        console.error("Error while joining game:", error);
+        console.error("Error while joining waiting list:", error);
+    }
+}
+
+export async function leaveWaitingList() {
+    try {
+        const hubConnection = get(connection);
+
+        if (!hubConnection || hubConnection.state !== HubConnectionState.Connected) {
+            console.error("No connection available to leave waiting list");
+            return;
+        }
+
+        await hubConnection.invoke("LeaveWaitingList");
+    } catch (error) {
+        console.error("Error while leaving waiting list:", error);
     }
 }
 

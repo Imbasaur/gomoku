@@ -1,12 +1,16 @@
 <script lang="ts" >
-	import { joinWaitingList } from "$lib/gameActions";
+	import { joinWaitingList, leaveWaitingList } from "$lib/gameActions";
 	import { afterGameModal, displayBoard, playerReady } from "$lib/stores";
 	import { clearBoard } from "$lib/utils";
 	import { Button, Spinner } from "flowbite-svelte";
 
     function handleFindGameButtonClick() {
-        joinWaitingList();
         $playerReady = !$playerReady;
+        if ($playerReady)
+            joinWaitingList();
+        else
+            leaveWaitingList();
+        
         if ($displayBoard) {
             clearBoard();
         }
