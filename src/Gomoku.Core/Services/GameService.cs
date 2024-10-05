@@ -118,9 +118,13 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
     {
         var moveTime = DateTime.UtcNow; // todo: should be client time? how to handle lags, cheating?
 
-        // move will be already validated
+        // todo: validate move (range, space on board)
+
         var game = await repository.GetAsync(x => x.Code == code);
         ArgumentNullException.ThrowIfNull(game);
+
+        if (game.State == GameState.PlayersConnected)
+            game.State = GameState.Started;
 
         if (game.State != GameState.Started)
             throw new GameMoveIncorrectStateException();
@@ -192,7 +196,7 @@ public class GameService(IGameRepository repository, IMapper mapper, IWaitingLis
         {
             gameTimeoutManager.StopTracking(game.Code);
             game.Winner = playerName == game.WhiteName ? game.BlackName : game.WhiteName;
-            game.State = GameState.Finished;
+            game.State = GameState.FinishedByPlayerDisconnect;
             await repository.UpdateAsync(game);
             await gameHub.Clients.Group(game.Code.ToString()).SendAsync("GameFinishedByPlayerDisconnect", new GameFinished
             {

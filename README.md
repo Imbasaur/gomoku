@@ -25,6 +25,8 @@ This web application allows playing the game with one-button matchmaking.
 > Below you can see a list of planned features, feel free to contribute :)
 >
 
+:white_square_button: Watch live games
+
 :white_square_button: Ingame/global chat
 
 :white_square_button: Private messages or private chat between players

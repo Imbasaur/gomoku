@@ -2,11 +2,9 @@
     import type { PageData } from './$types';
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
-	import { afterGameModal, clock, displayBoard, gameFinished, gameInfo, gameWinner, latestMove, moves, player, playerReady, winningStones } from '$lib/stores';
+	import { afterGameModal, displayBoard, gameFinished, gameWinner, player, playerReady } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
 	import { onMount } from 'svelte';
-	import type { Game } from '$lib/types/Game';
-	import { PUBLIC_BACKEND_ADDRESS } from '$env/static/public';
   	import { Button, Modal } from 'flowbite-svelte';
 	import { clearBoard } from '$lib/utils';
 	import { joinWaitingList } from '$lib/gameActions';
@@ -28,28 +26,14 @@
     const finishPlayingBtn = () => {
 		// todo: show find game btn?
     }
-
-	onMount(() => {
-		// getGames()
-		// 	.then(games => gamesList = games)
-	})
 </script>
 
 <svelte:head>
 	<title>Gomoku</title>
 	<meta name="description" content="Gomoku game" />
 </svelte:head>
+
 <div class="text-column">
-
-	<!-- {#if gamesList != undefined && gamesList.length != 0}
-		<p>Games</p>
-		<ul>
-			{#each gamesList as game}
-				<li>Code: {game.code}, Black Name: {game.blackName}, White Name: {game.whiteName}</li>
-			{/each}
-		</ul>
-	{/if} -->
-
 	{#if $player != '' && !$displayBoard}
 	<div>
 		<p>
