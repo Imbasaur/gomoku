@@ -18,28 +18,30 @@
     }
 
 </script>
-<div id="board">
-    {#each Array.from(Array(15).keys()) as column}
-        <div class="{numToAlpha(column + 1)}">
-            {#each Array.from(Array(15).keys()) as row}
-                {#if $moves.includes(numToAlpha(column + 1) + (15 - row))}
-                    <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
-                         id="node-{numToAlpha(column + 1)}{15 - row}" 
-                         on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
-                        <div class="stone {getStoneColor(numToAlpha(column + 1) + (15 - row))} 
-                            {($winningStones.includes(numToAlpha(column + 1) + (15 - row)) || (numToAlpha(column + 1) + (15 - row)) === $latestMove) ? 'highlight' : ''}">
+{#if $displayBoard}
+    <div id="board">
+        {#each Array.from(Array(15).keys()) as column}
+            <div class="{numToAlpha(column + 1)}">
+                {#each Array.from(Array(15).keys()) as row}
+                    {#if $moves.includes(numToAlpha(column + 1) + (15 - row))}
+                        <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
+                            id="node-{numToAlpha(column + 1)}{15 - row}" 
+                            on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
+                            <div class="stone {getStoneColor(numToAlpha(column + 1) + (15 - row))} 
+                                {($winningStones.includes(numToAlpha(column + 1) + (15 - row)) || (numToAlpha(column + 1) + (15 - row)) === $latestMove) ? 'highlight' : ''}">
+                            </div>
                         </div>
-                    </div>
-                {:else}
-                    <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
-                         id="node-{numToAlpha(column + 1)}{15 - row}" 
-                         on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
-                    </div>
-                {/if}
-            {/each}
-        </div>
-    {/each}
-</div>
+                    {:else}
+                        <div class="node {numToAlpha(column + 1)}{15 - row} node-{numToAlpha(column + 1)}{15 - row} column-{numToAlpha(column + 1)} row-{15 - row}" 
+                            id="node-{numToAlpha(column + 1)}{15 - row}" 
+                            on:click|preventDefault={(e) => handleClick(e, 1 + column, 15 - row)}>
+                        </div>
+                    {/if}
+                {/each}
+            </div>
+        {/each}
+    </div>
+{/if}
 
 <style>
     #board {

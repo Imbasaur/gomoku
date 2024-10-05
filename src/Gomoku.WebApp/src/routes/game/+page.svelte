@@ -2,15 +2,17 @@
     import type { PageData } from './$types';
 	import GameHub from '../GameHub.svelte';
 	import GameBoard from '../GameBoard.svelte';
-	import { afterGameModal, displayBoard, gameFinished, gameWinner, player, playerReady } from '$lib/stores';
+	import { activePlayer, afterGameModal, displayBoard, gameFinished, gameWinner, player, playerReady } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
   	import { Button, Modal } from 'flowbite-svelte';
 	import { clearBoard } from '$lib/utils';
 	import { joinWaitingList } from '$lib/gameActions';
+	import { onDestroy } from 'svelte';
     
     export let data: PageData;
 
 	gameFinished.subscribe((value) => {
+		console.log('gmaefinish subscribe change modal to true')
 		if (value && !$afterGameModal){
 			$afterGameModal = true
 		}
@@ -23,8 +25,14 @@
     }
 
     const finishPlayingBtn = () => {
-		// todo: show find game btn?
+		$afterGameModal = false
+		$activePlayer = "";
+		gameFinished.set(false)
     }
+
+	onDestroy(async () => {
+		finishPlayingBtn();
+	})
 </script>
 
 <svelte:head>
