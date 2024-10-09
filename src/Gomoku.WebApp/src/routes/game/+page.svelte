@@ -5,23 +5,23 @@
 	import { activePlayer, afterGameModal, displayBoard, gameFinished, gameWinner, player, playerReady } from '$lib/stores';
 	import GamePanel from '../GamePanel.svelte';
   	import { Button, Modal } from 'flowbite-svelte';
-	import { clearBoard } from '$lib/utils';
+	import { clearBoard, removeParamFromUrl } from '$lib/utils';
 	import { joinWaitingList } from '$lib/gameActions';
 	import { onDestroy } from 'svelte';
     
     export let data: PageData;
 
 	gameFinished.subscribe((value) => {
-		console.log('gmaefinish subscribe change modal to true')
 		if (value && !$afterGameModal){
 			$afterGameModal = true
 		}
 	})
 
     const playNextBtn = () => {
-		clearBoard()
-		$playerReady = true
-		joinWaitingList()
+		clearBoard();
+		$playerReady = true;
+		joinWaitingList();
+		removeParamFromUrl('id');
     }
 
     const finishPlayingBtn = () => {

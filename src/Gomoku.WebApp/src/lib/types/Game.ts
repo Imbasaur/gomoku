@@ -1,4 +1,5 @@
 export interface Game {
+    readonly id: number;
     readonly code: string;
     readonly state: number;
     readonly blackName: string;

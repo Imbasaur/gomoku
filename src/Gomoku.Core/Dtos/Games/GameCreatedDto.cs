@@ -3,6 +3,7 @@
 namespace Gomoku.Core.Dtos.Games;
 public class GameCreatedDto
 {
+    public int Id { get; set; }
     public Guid Code { get; set; }
     public string BlackName { get; set; }
     public string WhiteName { get; set; }

@@ -6,6 +6,7 @@ import { joinGame } from './gameActions';
 import { HubConnectionState } from '@microsoft/signalr';
 import type { InitGame } from './types/InitGame';
 import type { Game } from './types/Game';
+import { addParamToUrl } from './utils';
 
 export const connection = writable<signalR.HubConnection | null>(null);
 
@@ -63,8 +64,10 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     });
 
     hubConnection.on('PlayerConnected', name => {
-        if (name == get(player))
-            displayBoard.set(true)
+        if (name == get(player)){
+            displayBoard.set(true);
+            addParamToUrl('id', get(gameInfo).id.toString());
+        }
     })
     
     hubConnection.on('PlayersConnected', () => {
@@ -99,7 +102,7 @@ function setupEventHandlers(hubConnection: signalR.HubConnection) {
     });
 
     hubConnection.on('GameFinishedByPlayerDisconnect', response => {
-        console.log('Game finished by player timeout:', response);
+        console.log('Game finished by player disconnect:', response);
         removeActiveGame(response.code);
         if (!get(gameFinished)){
             gameWinner.set(response.winner)
